@@ -68,6 +68,7 @@ export default function MasterProductsTable({
               <TableCell>Sr No</TableCell>
               <TableCell>Image</TableCell>
               <TableCell>Name</TableCell>
+              <TableCell>Category</TableCell>
               <TableCell>Active</TableCell>
               <TableCell>Variants</TableCell>
               <TableCell>Created At</TableCell>
@@ -91,9 +92,9 @@ export default function MasterProductsTable({
 
                   {/* Image */}
                   <TableCell>
-                    {product.image ? (
+                    {product.imageUrl ? (
                       <img
-                        src={product.image}
+                        src={product.imageUrl}
                         alt={product.name}
                         style={{
                           width: 48,
@@ -126,6 +127,11 @@ export default function MasterProductsTable({
                   {/* Name */}
                   <TableCell>
                     <span className="font-medium">{product.name || "-"}</span>
+                  </TableCell>
+
+                  {/* Category */}
+                  <TableCell>
+                    <span className="font-small">{product.category || "-"}</span>
                   </TableCell>
 
                   {/* Active */}
