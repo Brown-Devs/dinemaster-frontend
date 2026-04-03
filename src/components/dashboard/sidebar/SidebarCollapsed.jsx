@@ -666,7 +666,7 @@ export default function SidebarCollapsed({ onOpenFull }) {
     //   ];
     // }
 
-    return base;
+    return [];
   }, [user]);
 
   /* ---------- FILTER ---------- */
