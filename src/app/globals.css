@@ -1,0 +1,122 @@
+@import "tailwindcss";
+
+/* -- Light values -- */
+:root {
+  --bg: #ffffff;
+  --background: #f3f4f6;
+  --fg: #171717;
+  --card: #ffffff;
+  --card2: #f2f2f2;
+  --cardsBG: #e8e8e8;
+  --border: #d1d5db;
+  --border2: #cdd2d9;
+  --border3: #1f2937;
+  --muted: #6b7280;
+  --accent: #000000;
+  --crem: #efeae2;
+  --chat-active: #e7f3ec;
+  --font-sans: var(--font-sans);
+  --meta-color: #2563eb;
+  --whatsapp-color: #16a34a;
+  --website-color: #06b6d4;
+  --justdial-color: #f59e0b;
+  --indiamart-color: #16a34a;
+  --sulekha-color: #a855f7;
+  --99acres-color: #ec4899;
+  --housing-color: #14b8a6;
+  --magicbricks-color: #ef4444;
+}
+
+.dark {
+  --bg: #0a0a0a;
+  --background: #0a0a0a;
+  --fg: #ededed;
+  --card: #0f1724;
+  --card2: #080d14;
+  --cardsBG: #202020;
+  --border: #1f2937;
+  --border2: #4d5767;
+  --border3: #d1d5db;
+  --muted: #9ca3af;
+  --accent: #ffffff;
+  --crem: #080d14;
+  --chat-active: #1b2f26;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--fg);
+  --color-cardsBG: var(--cardsBG);
+  --color-card: var(--card);
+  --color-card2: var(--card2);
+  --color-border: var(--border);
+  --color-border2: var(--border2);
+  --color-border3: var(--border3);
+  --color-crem: var(--crem);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --color-chat-active: var(--chat-active);
+}
+
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+} */
+
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans), Inter, sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cccfd1;
+  /* border-radius: 4px; */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Hide scrollbar but allow horizontal scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  /* IE & Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari */
+}
+
+@keyframes toast-zoom {
+  0% {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-toast-zoom {
+  animation: toast-zoom 0.25s ease-out;
+}
+
