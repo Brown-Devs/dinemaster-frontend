@@ -35,24 +35,13 @@ export default function LoginPage() {
         initializeAuth();
     }, []);
 
-    // // redirect after user is known
-    // useEffect(() => {
-    //     if (!user) return;
-
-    //     if (user?.role === USERTYPE.ADMIN) {
-    //         router.replace('/dashboard/companies');
-    //     } else {
-    //         router.replace('/dashboard')
-    //     }
-    // }, [user, router])
-
     const handleContinue = () => {
         if (!user) return;
 
         if (user.role === USERTYPE.ADMIN) {
-            router.replace('/dashboard/companies');
+            router.push('/dashboard/companies');
         } else {
-            router.replace('/dashboard');
+            router.push('/dashboard');
         }
     };
 
@@ -96,7 +85,11 @@ export default function LoginPage() {
             setAuth(userData, token, sessionId);
 
             // redirect to dashboard
-            router.replace("/dashboard");
+            if (userData.role === USERTYPE.ADMIN) {
+                router.push('/dashboard/companies');
+            } else {
+                router.push('/dashboard');
+            }
         } catch (error) {
             console.log("Error:", error?.response?.data?.message || error?.message);
             setErrorMessage(error?.response?.data?.message || error?.message);

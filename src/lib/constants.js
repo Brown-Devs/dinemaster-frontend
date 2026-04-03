@@ -1,8 +1,8 @@
 // lib/constants.js
 export const USERTYPE = {
+    ADMIN: 'super_admin',
     COMPANY: 'admin',
     EMPLOYEE: 'subadmin',
-    ADMIN: 'super_admin'
 }
 
 export const USER_DESIGNATIONS = {

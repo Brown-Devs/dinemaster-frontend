@@ -81,6 +81,12 @@ export default function Sidebar({
           path: "/dashboard/companies",
           module: MODULES.BASE,
         },
+        {
+          label: "Master Products",
+          icon: <Inventory2 />,
+          path: "/dashboard/masterProducts?page=1&limit=10",
+          // module: MODULES.BASE,
+        },
       ];
     }
 

@@ -116,6 +116,12 @@ export default function SidebarCollapsed({ onOpenFull }) {
           path: "/dashboard/companies",
           // module: MODULES.BASE,
         },
+        {
+          label: "Master Products",
+          icon: <Inventory2 />,
+          path: "/dashboard/masterProducts?page=1&limit=10",
+          // module: MODULES.BASE,
+        },
       ];
     }
 
@@ -709,7 +715,7 @@ export default function SidebarCollapsed({ onOpenFull }) {
       <Box display="flex" justifyContent="center">
         <Tooltip title="Open Menu" placement="right">
           <IconButton onClick={onOpenFull}>
-            <Image src="/logo-512.png" alt="logo" width={36} height={36} />
+            <img src="/logo-512.png" alt="logo" className="w-10 h-10" />
           </IconButton>
         </Tooltip>
       </Box>
