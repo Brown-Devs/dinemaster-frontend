@@ -66,7 +66,6 @@ export default function MasterProductsPage() {
 
   const { masterProductsQuery } = useMasterProducts();
   const masterProductsData = masterProductsQuery(queryParams);
-
   const apiData = masterProductsData?.data?.data?.data || {
     masterProducts: [],
     pagination: { page: 1, limit: 10 },
@@ -107,7 +106,7 @@ export default function MasterProductsPage() {
               <Button
                 variant="outlined"
                 startIcon={<AddIcon />}
-                // onClick={() => setDialogOpen(true)}
+              // onClick={() => setDialogOpen(true)}
               >
                 Add New
               </Button>
@@ -139,7 +138,7 @@ export default function MasterProductsPage() {
 
         <MasterProductsTable
           apiData={apiData}
-          products={apiData.masterProducts}
+          products={apiData}
           loading={masterProductsData.isLoading}
           limit={limit}
           setLimit={(val) => updateParams({ limit: val, page: 1 })}
