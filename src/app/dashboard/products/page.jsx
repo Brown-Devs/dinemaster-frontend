@@ -1,33 +1,27 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import InnerDashboardLayout from "@/components/dashboard/InnerDashboardLayout";
+import { useDebounce } from "@/hooks/useDebounce";
 import {
   Button,
-  Tabs,
-  Tab,
   Box,
-  Typography,
   IconButton,
   Tooltip,
   TextField,
   InputAdornment,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Select,
+  Checkbox,
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddIcon from "@mui/icons-material/Add";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import SearchIcon from "@mui/icons-material/Search";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 import { useBrandProducts } from "@/hooks/admin/useBrandProducts";
-import BrandProductsTable from "./components/BrandProductsTable";
-import ImportFromMasterTab from "./components/ImportFromMasterTab";
+import ProductCardsGrid from "./components/ProductCardsGrid";
+import ImportProductsDrawer from "./components/ImportProductsDrawer";
 import ProductFormModal from "./components/ProductFormModal";
 
 export default function ProductsPage() {
@@ -35,14 +29,29 @@ export default function ProductsPage() {
   const searchParams = useSearchParams();
 
   // URL State
-  const isImportMode = searchParams.get("import") === "true";
-  const currentTab = searchParams.get("tab") || "all";
   const searchStr = searchParams.get("search") || "";
   const page = parseInt(searchParams.get("page") || "1");
   const limit = parseInt(searchParams.get("limit") || "10");
 
   // Local State
   const [selectedIds, setSelectedIds] = useState([]);
+  const [searchInput, setSearchInput] = useState(searchStr);
+  const debouncedSearch = useDebounce(searchInput, 500);
+
+  // Sync searchInput with URL if URL changes (e.g. back button)
+  useEffect(() => {
+    setSearchInput(searchStr);
+  }, [searchStr]);
+
+  // Update URL when debounced search changes
+  useEffect(() => {
+    if (debouncedSearch !== searchStr) {
+      updateURL({ search: debouncedSearch, page: 1 });
+    }
+  }, [debouncedSearch]);
+
+  // Import Drawer State
+  const [importDrawerOpen, setImportDrawerOpen] = useState(false);
   const [importSelectedIds, setImportSelectedIds] = useState([]);
   const [importSearch, setImportSearch] = useState("");
   const [importCategory, setImportCategory] = useState("");
@@ -59,10 +68,13 @@ export default function ProductsPage() {
     page,
     limit,
     search: searchStr,
-    type: currentTab === "all" ? "" : currentTab,
+    type: "",
   });
 
   const apiData = brandProductsData?.data?.data?.data || { products: [], pagination: {} };
+  const products = apiData?.products || [];
+  const currentPage = apiData?.pagination?.page || 1;
+  const total = apiData?.pagination?.totalCount || 0;
 
   const updateURL = (newParams) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -76,14 +88,6 @@ export default function ProductsPage() {
     router.replace(`?${params.toString()}`);
   };
 
-  const handleTabChange = (event, newValue) => {
-    updateURL({ tab: newValue, page: 1 });
-  };
-
-  const toggleImportMode = (enable) => {
-    updateURL({ import: enable ? "true" : "", page: 1, search: "" });
-  };
-
   const handleBulkDelete = async () => {
     if (window.confirm(`Are you sure you want to delete ${selectedIds.length} products?`)) {
       await bulkDeleteMutation.mutateAsync({ ids: selectedIds });
@@ -95,7 +99,7 @@ export default function ProductsPage() {
     if (importSelectedIds.length === 0) return;
     await bulkImportMutation.mutateAsync({ masterCatalogIds: importSelectedIds });
     setImportSelectedIds([]);
-    toggleImportMode(false); // Return to main tab
+    setImportDrawerOpen(false);
   };
 
   const handleOpenAddModal = () => {
@@ -108,137 +112,145 @@ export default function ProductsPage() {
     setIsModalOpen(true);
   };
 
+  const handleOpenImportDrawer = () => {
+    setImportSelectedIds([]);
+    setImportSearch("");
+    setImportCategory("");
+    setImportPage(1);
+    setImportLimit(25);
+    setImportDrawerOpen(true);
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm("Are you sure you want to delete this product?")) {
+      bulkDeleteMutation.mutateAsync({ ids: [id] });
+    }
+  };
+
+  const handleSelectAllOnPage = (event) => {
+    if (event.target.checked) {
+      const pageIds = products.map((n) => n._id);
+      setSelectedIds((prev) => [...new Set([...prev, ...pageIds])]);
+    } else {
+      const pageIds = products.map((n) => n._id);
+      setSelectedIds((prev) => prev.filter((id) => !pageIds.includes(id)));
+    }
+  };
+
+  const allOnPageSelected = products.length > 0 && products.every((p) => selectedIds.includes(p._id));
+  const someOnPageSelected = products.some((p) => selectedIds.includes(p._id)) && !allOnPageSelected;
+
   return (
     <InnerDashboardLayout>
       <div className="flex justify-between items-center mb-6 mt-2 flex-wrap gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            {isImportMode && (
-              <IconButton onClick={() => toggleImportMode(false)} size="small" sx={{ mb: 1 }}>
-                <ArrowBackIcon />
-              </IconButton>
-            )}
-            <h1 className="font-bold text-3xl tracking-tight">
-              {isImportMode ? "Import Products" : "Products"}
-            </h1>
-          </div>
-          <p className="text-gray-500">
-            {isImportMode
-              ? "Import products from the global master catalog to your brand."
-              : "Manage your company products, add new ones or import from master catalog."}
+          <h1 className="font-bold text-3xl tracking-tight">Products</h1>
+          <p style={{ color: "var(--muted)" }}>
+            Manage your company products, add new ones or import from master catalog.
           </p>
         </div>
 
         <div className="flex gap-2">
-          {!isImportMode ? (
-            <>
-              <Button
-                variant="outlined"
-                startIcon={<CloudDownloadIcon />}
-                onClick={() => toggleImportMode(true)}
-              >
-                Import Products
-              </Button>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                color="primary"
-                onClick={handleOpenAddModal}
-              >
-                Add Product
-              </Button>
-            </>
-          ) : (
-            <Button
-                variant="outlined"
-                onClick={() => toggleImportMode(false)}
-            >
-                Cancel
-            </Button>
-          )}
+          <Button
+            variant="outlined"
+            startIcon={<CloudDownloadIcon />}
+            onClick={handleOpenImportDrawer}
+          >
+            Import Products
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            color="primary"
+            onClick={handleOpenAddModal}
+          >
+            Add Product
+          </Button>
         </div>
       </div>
 
-      {!isImportMode ? (
-        <Box sx={{ width: "100%" }}>
-          {/* Main Table View */}
-          <div className="bg-card p-4 sm:p-6 border border-border rounded-2xl shadow-sm space-y-4">
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <Tabs value={currentTab} onChange={handleTabChange} textColor="primary" indicatorColor="primary">
-                <Tab label="All" value="all" sx={{ textTransform: "none", fontWeight: 600 }} />
-                <Tab label="Imported" value="imported" sx={{ textTransform: "none", fontWeight: 600 }} />
-                <Tab label="Self Added" value="manual" sx={{ textTransform: "none", fontWeight: 600 }} />
-              </Tabs>
-
-              <div className="flex gap-2 items-center flex-wrap">
-                <TextField
-                  size="small"
-                  placeholder="Search products..."
-                  value={searchStr}
-                  onChange={(e) => updateURL({ search: e.target.value, page: 1 })}
-                  sx={{ width: 200 }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon sx={{ color: "gray", fontSize: 18 }} />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-                
-                {selectedIds.length > 0 && (
-                  <Button
-                    variant="contained"
-                    color="error"
-                    size="small"
-                    startIcon={<DeleteSweepIcon />}
-                    onClick={handleBulkDelete}
-                  >
-                    Delete ({selectedIds.length})
-                  </Button>
-                )}
-                
-                <Tooltip title="Refresh">
-                  <IconButton onClick={() => brandProductsData.refetch()} disabled={brandProductsData.isFetching}>
-                    <RefreshIcon fontSize="small" className={brandProductsData.isFetching ? "animate-spin" : ""} />
-                  </IconButton>
-                </Tooltip>
-              </div>
+      <Box sx={{ width: "100%" }}>
+        <div className="bg-card p-4 sm:p-6 border border-border rounded-2xl shadow-sm space-y-4">
+          {/* Toolbar */}
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex gap-2 items-center">
+              <Checkbox
+                size="small"
+                checked={allOnPageSelected}
+                indeterminate={someOnPageSelected}
+                onChange={handleSelectAllOnPage}
+                sx={{ p: 0.5 }}
+              />
+              <TextField
+                size="small"
+                placeholder="Search products..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                sx={{ width: { xs: 150, sm: 220 } }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ color: "gray", fontSize: 18 }} />
+                    </InputAdornment>
+                  ),
+                }}
+              />
             </div>
 
-            <BrandProductsTable
-              apiData={apiData}
-              loading={brandProductsData.isLoading}
-              limit={limit}
-              setLimit={(l) => updateURL({ limit: l, page: 1 })}
-              onPageChange={(p) => updateURL({ page: p })}
-              selectedIds={selectedIds}
-              onSelectChange={setSelectedIds}
-              onEdit={handleOpenEditModal}
-              onDelete={(id) => {
-                  if(window.confirm("Are you sure you want to delete this product?")) bulkDeleteMutation.mutateAsync({ ids: [id] });
-              }}
-            />
+            <div className="flex gap-2 items-center flex-wrap">
+              {selectedIds.length > 0 && (
+                <Button
+                  variant="contained"
+                  color="error"
+                  size="small"
+                  startIcon={<DeleteSweepIcon />}
+                  onClick={handleBulkDelete}
+                >
+                  Delete ({selectedIds.length})
+                </Button>
+              )}
+              
+              <Tooltip title="Refresh">
+                <IconButton onClick={() => brandProductsData.refetch()} disabled={brandProductsData.isFetching}>
+                  <RefreshIcon fontSize="small" className={brandProductsData.isFetching ? "animate-spin" : ""} />
+                </IconButton>
+              </Tooltip>
+            </div>
           </div>
-        </Box>
-      ) : (
-        <div className="bg-card p-4 sm:p-6 border border-border rounded-2xl shadow-sm">
-          {/* Import List View */}
-          <ImportFromMasterTab
-             search={importSearch}
-             setSearch={setImportSearch}
-             category={importCategory}
-             setCategory={setImportCategory}
-             page={importPage}
-             setPage={setImportPage}
-             limit={importLimit}
-             setLimit={setImportLimit}
-             selectedIds={importSelectedIds}
-             setSelectedIds={setImportSelectedIds}
-             onBulkImport={handleBulkImport}
+
+          {/* Product Cards */}
+          <ProductCardsGrid
+            products={products}
+            loading={brandProductsData.isLoading}
+            limit={limit}
+            currentPage={currentPage}
+            total={total}
+            onPageChange={(p) => updateURL({ page: p })}
+            setLimit={(l) => updateURL({ limit: l, page: 1 })}
+            selectedIds={selectedIds}
+            onSelectChange={setSelectedIds}
+            onEdit={handleOpenEditModal}
+            onDelete={handleDelete}
           />
         </div>
-      )}
+      </Box>
+
+      {/* Import Products Drawer */}
+      <ImportProductsDrawer
+        open={importDrawerOpen}
+        onClose={() => setImportDrawerOpen(false)}
+        search={importSearch}
+        setSearch={setImportSearch}
+        category={importCategory}
+        setCategory={setImportCategory}
+        page={importPage}
+        setPage={setImportPage}
+        limit={importLimit}
+        setLimit={setImportLimit}
+        selectedIds={importSelectedIds}
+        setSelectedIds={setImportSelectedIds}
+        onBulkImport={handleBulkImport}
+      />
 
       <ProductFormModal
         open={isModalOpen}

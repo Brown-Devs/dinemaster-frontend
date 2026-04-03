@@ -38,10 +38,11 @@ export default function ImportFromMasterTab({
   onBulkImport
 }) {
   const { notImportedProductsQuery, masterCategoriesQuery } = useBrandProducts();
-  
+
   const { data: catData, isLoading: catLoading } = masterCategoriesQuery();
   const categories = catData?.data?.data || [];
 
+  console.log(categories)
   const { data: productsData, isLoading: productsLoading } = notImportedProductsQuery({
     page,
     limit,
@@ -52,14 +53,15 @@ export default function ImportFromMasterTab({
   const apiData = productsData?.data?.data || { masterProducts: [], pagination: {} };
   const products = apiData.masterProducts || [];
   const total = apiData.pagination?.totalCount || 0;
+  console.log(products)
 
   const handleSelectOne = (id) => {
     const selectedIndex = selectedIds.indexOf(id);
     let newSelected = [];
     if (selectedIndex === -1) {
-        newSelected = [...selectedIds, id];
+      newSelected = [...selectedIds, id];
     } else {
-        newSelected = selectedIds.filter(item => item !== id);
+      newSelected = selectedIds.filter(item => item !== id);
     }
     setSelectedIds(newSelected);
   };
@@ -108,8 +110,8 @@ export default function ImportFromMasterTab({
             value={category || ""}
             label="Category"
             onChange={(e) => {
-                setCategory(e.target.value);
-                setPage(1);
+              setCategory(e.target.value);
+              setPage(1);
             }}
           >
             <MenuItem value="">All Categories</MenuItem>
@@ -120,23 +122,23 @@ export default function ImportFromMasterTab({
         </FormControl>
 
         <div className="ml-auto flex gap-2">
-            <Button 
-                variant="outlined" 
-                size="small" 
-                color="secondary"
-                onClick={handleSelectAllInCategory}
-                disabled={products.length === 0}
-            >
-                Select Current Page
-            </Button>
-            <Button
-                variant="contained"
-                startIcon={<CloudDownloadIcon />}
-                disabled={selectedIds.length === 0}
-                onClick={onBulkImport}
-            >
-                Import Selected ({selectedIds.length})
-            </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            color="secondary"
+            onClick={handleSelectAllInCategory}
+            disabled={products.length === 0}
+          >
+            Select Current Page
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<CloudDownloadIcon />}
+            disabled={selectedIds.length === 0}
+            onClick={onBulkImport}
+          >
+            Import Selected ({selectedIds.length})
+          </Button>
         </div>
       </div>
 
@@ -197,10 +199,10 @@ export default function ImportFromMasterTab({
                       <span className="font-medium text-sm">{product.name}</span>
                     </TableCell>
                     <TableCell>
-                       <Chip label={product.category} size="small" variant="outlined" sx={{ fontSize: 10, height: 18 }} />
+                      <Chip label={product.category} size="small" variant="outlined" sx={{ fontSize: 10, height: 18 }} />
                     </TableCell>
                     <TableCell>
-                       <span className="text-xs text-gray-500">{product.variants?.length || 0} Variants</span>
+                      <span className="text-xs text-gray-500">{product.variants?.length || 0} Variants</span>
                     </TableCell>
                   </TableRow>
                 );
