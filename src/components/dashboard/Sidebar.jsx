@@ -54,6 +54,9 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import EventIcon from "@mui/icons-material/Event";
 import DescriptionIcon from "@mui/icons-material/Description";
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import CategoryIcon from "@mui/icons-material/Category";
+import ReceiptIcon from "@mui/icons-material/Receipt";
 
 const drawerWidth = 260;
 
@@ -89,6 +92,180 @@ export default function Sidebar({
         },
       ];
     }
+
+    const base = [
+      {
+        label: "Dashboard",
+        icon: <DashboardIcon />,
+        path: "/dashboard",
+        module: MODULES.BASE,
+      },
+       {
+        label: "Billing",
+        icon: <ReceiptIcon />,
+        path: "/dashboard/billing",
+        module: MODULES.BILLING,
+        permissions: PERMISSIONS.BILLING_VIEW,
+      },
+      {
+        label: "Orders",
+        icon: <ShoppingCartIcon />,
+        path: "/dashboard/orders",
+        module: MODULES.ORDERS,
+        permissions: PERMISSIONS.ORDERS_VIEW,
+      },
+      {
+        label: "Customers",
+        icon: <Person2Icon fontSize="small" />,
+        path: "/dashboard/customers",
+        module: MODULES.CUSTOMERS,
+        permissions: PERMISSIONS.CUSTOMERS_VIEW,
+      },
+      {
+        label: "Products",
+        icon: <Inventory2 />,
+        path: "/dashboard/products",
+        module: MODULES.PRODUCTS,
+        permissions: PERMISSIONS.PRODUCTS_VIEW,
+      },
+      {
+        label: "Categories",
+        icon: <CategoryIcon />,
+        path: "/dashboard/categories",
+        module: MODULES.CATEGORIES,
+        permissions: PERMISSIONS.CATEGORIES_VIEW,
+      },
+      // {
+      //   label: "WhatsApp",
+      //   icon: <WhatsAppIcon />,
+      //   path: "/dashboard/whatsapp",
+      //   module: MODULES.WHATSAPP,
+      //   permissions: PERMISSIONS.WHATSAPP_VIEW,
+      // },
+     
+      {
+        label: "Reports",
+        icon: <AssessmentIcon />,
+        expandable: true,
+        children: [
+          {
+            label: "Today's Report",
+            path: "/dashboard/reports/today",
+            icon: <TodayIcon fontSize="small" />,
+        module: MODULES.REPORTS,
+            permissions: PERMISSIONS.REPORTS_VIEW,
+          },
+          {
+            label: "Performance",
+            path: "/dashboard/reports/performance",
+            icon: <TrendingUpIcon fontSize="small" />,
+        module: MODULES.REPORTS,
+            permissions: PERMISSIONS.REPORTS_VIEW,
+          },
+          {
+            label: "Overall Report",
+            path: "/dashboard/reports/overall",
+            icon: <AnalyticsIcon fontSize="small" />,
+        module: MODULES.REPORTS,
+            permissions: PERMISSIONS.REPORTS_VIEW,
+          },
+        ],
+        module: MODULES.REPORTS,
+        permissions: PERMISSIONS.REPORTS_VIEW,
+      },
+      {
+        label: "Staff",
+        icon: <PeopleIcon />,
+        expandable: true,
+        children: [
+          {
+            label: "Admins",
+            path: "/dashboard/staff/admins",
+            icon: <AdminPanelSettingsIcon fontSize="small" />,
+        permissions: PERMISSIONS.STAFF_VIEW,
+        module: MODULES.STAFF_BASE,
+          },
+          {
+            label: "Sub Admins",
+            path: "/dashboard/staff/sub-admins",
+            icon: <SupervisedUserCircleIcon fontSize="small" />,
+        permissions: PERMISSIONS.STAFF_VIEW,
+        module: MODULES.STAFF_BASE,
+          },
+        ],
+        module: MODULES.STAFF_BASE,
+        permissions: PERMISSIONS.STAFF_VIEW,
+      },
+      {
+        label: "Settings",
+        icon: <Settings />,
+        path: "/dashboard/settings",
+        module: MODULES.SETTINGS,
+        permissions: PERMISSIONS.SETTINGS_VIEW,
+      },
+    ];
+
+    return base;
+  }, [user]);
+
+  return (
+    <Drawer
+      variant={variant}
+      open={open}
+      onClose={onClose}
+      className=""
+      sx={{
+        width: drawerWidth,
+        flexShrink: 0,
+        "& .MuiDrawer-paper": {
+          width: drawerWidth,
+          boxSizing: "border-box",
+          display: "flex",
+          flexDirection: "column",
+          borderRight: "1px solid rgba(0,0,0,0.08)",
+          px: 1.5,
+
+          // important: overflow hidden on paper
+          overflow: "hidden",
+          zIndex: 1200,
+        },
+      }}
+      slotProps={{
+        paper: {
+          className: "",
+        },
+      }}
+    >
+      <Box
+        sx={{
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <SidebarHeader user={user} />
+
+        <SidebarMenu
+          sections={sections}
+          pathname={pathname}
+          variant={variant}
+          onClose={onClose}
+        />
+
+        <SidebarFooter
+          user={user}
+          mode={mode}
+          setMode={setMode}
+          router={router}
+          variant={variant}
+          onClose={onClose}
+        />
+      </Box>
+    </Drawer>
+  );
+}
+
+
 
     // const base = [
     //   {
@@ -656,63 +833,3 @@ export default function Sidebar({
     //     },
     //   ];
     // }
-
-    return [];
-  }, [user]);
-
-  return (
-    <Drawer
-      variant={variant}
-      open={open}
-      onClose={onClose}
-      className=""
-      sx={{
-        width: drawerWidth,
-        flexShrink: 0,
-        "& .MuiDrawer-paper": {
-          width: drawerWidth,
-          boxSizing: "border-box",
-          display: "flex",
-          flexDirection: "column",
-          borderRight: "1px solid rgba(0,0,0,0.08)",
-          px: 1.5,
-
-          // important: overflow hidden on paper
-          overflow: "hidden",
-          zIndex: 1200,
-        },
-      }}
-      slotProps={{
-        paper: {
-          className: "",
-        },
-      }}
-    >
-      <Box
-        sx={{
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <SidebarHeader user={user} />
-
-        <SidebarMenu
-          sections={sections}
-          pathname={pathname}
-          variant={variant}
-          onClose={onClose}
-        />
-
-        <SidebarFooter
-          user={user}
-          mode={mode}
-          setMode={setMode}
-          router={router}
-          variant={variant}
-          onClose={onClose}
-        />
-      </Box>
-    </Drawer>
-  );
-}

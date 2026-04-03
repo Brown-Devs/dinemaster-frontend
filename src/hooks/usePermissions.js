@@ -25,13 +25,13 @@ export function usePermissions() {
     const isModuleEnabled = (permission) => {
         // console.log("company modules: ",companyPermissions);
         // console.log("requested module: ",permission);
-        if(user.role === 'admin') return true;
+        if (user.systemRole === 'super_admin') return true;
         return companyPermissions?.includes(permission) || permission == "modules.base";
     };
 
     // helper function to check permission
     const checkPermission = (permission) => {
-        if (user?.role === 'admin' || user?.role === 'company') return true; // admin has all permissions
+        if (user?.systemRole === 'super_admin' || user?.systemRole === 'admin') return true; // admin has all permissions
 
         if (!permission || !userPermissions) return false;
         return userPermissions.includes(permission);

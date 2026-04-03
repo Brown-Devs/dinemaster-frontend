@@ -13,13 +13,11 @@ export default function SidebarHeader({ user }) {
 
   return (
     <Box sx={{ flexShrink: 0 }}>
-      <Box pr={3} py={1.5} display="flex" justifyContent="center" alignItems="center">
-        <Image
+      <Box pr={3} py={2.5} display="flex" justifyContent="center" alignItems="center">
+        <img
           src={logoSrc}
           alt="Logo"
-          width={250}
-          height={88}
-          style={{ objectFit: "contain", borderRadius: "8px" }}
+          className="object-contain rounded-md w-auto h-10"
           priority
         />
       </Box>

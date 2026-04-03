@@ -30,31 +30,6 @@ export default function AdminLayout({ children }) {
     // }, []);
 
 
-    // useEffect(() => {
-    //     const apiData = todayAttendanceQuery.data?.data;
-    //     if (!apiData) return;
-
-    //     if (!apiData.record) {
-    //         clear();
-    //     } else {
-    //         setFromApi(apiData);
-    //     }
-    // }, [todayAttendanceQuery.data]);
-
-    // useEffect(() => {
-    //     fetchNotifications();
-    // }, []);
-
-    // useEffect(() => {
-    //     const data = fetchLeadStatuses?.data?.data;
-    //     // console.log("Lead Status Data: ", data)
-    // }, [fetchLeadStatuses?.data])
-
-    // useEffect(() => {
-    // const configQuery = getRoleLabelsConfig();
-    // const config = configQuery?.data?.data;
-    // }, [getRoleLabelsConfig?.data])
-
     useEffect(() => {
         initializeAuth();
     }, [initializeAuth]);
@@ -73,7 +48,7 @@ export default function AdminLayout({ children }) {
 
         if (user) {
             const allowed = [USERTYPE.EMPLOYEE, USERTYPE.ADMIN, USERTYPE.COMPANY];
-            if (!allowed.includes(user.role)) {
+            if (!allowed.includes(user.systemRole)) {
                 toast.error("You are not authorized to access this page!");
                 clearAuth();
                 router.replace("/");

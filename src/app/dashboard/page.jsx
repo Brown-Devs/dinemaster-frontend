@@ -1,26 +1,26 @@
 // app/company/dashboard/page.jsx
 "use client";
-import React, { useMemo, useState } from "react";
+import React from "react";
 import InnerDashboardLayout from "@/components/dashboard/InnerDashboardLayout";
 import { useAuthStore } from "@/stores/useAuthStore";
-// import { MODULES, USER_DESIGNATIONS } from "@/lib/constants";
-// import { usePermissions } from "@/hooks/usePermissions";
-// import AccessDenied from "@/components/shared/AccessDenied";
+import { MODULES } from "@/lib/constants";
+import { usePermissions } from "@/hooks/usePermissions";
+import AccessDenied from "@/components/shared/AccessDenied";
 
 export default function CompanyDashboardPage() {
   const { user } = useAuthStore();
 
-//   const { isModuleEnabled } = usePermissions();
-//   if (!isModuleEnabled(MODULES.BASE)) {
-//     return (
-//       <InnerDashboardLayout>
-//         <AccessDenied
-//           title="Access disabled"
-//           description="Your organization is not allowed to access this."
-//         />
-//       </InnerDashboardLayout>
-//     );
-//   }
+  const { isModuleEnabled } = usePermissions();
+  if (!isModuleEnabled(MODULES.BASE)) {
+    return (
+      <InnerDashboardLayout>
+        <AccessDenied
+          title="Access disabled"
+          description="Your organization is not allowed to access this."
+        />
+      </InnerDashboardLayout>
+    );
+  }
   return (
     <InnerDashboardLayout>
       {/* Header with refresh */}
