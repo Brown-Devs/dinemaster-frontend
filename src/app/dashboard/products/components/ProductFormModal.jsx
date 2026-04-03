@@ -100,6 +100,7 @@ export default function ProductFormModal({ open, onClose, product = null }) {
     const fd = new FormData();
     fd.append("file", file);
     fd.append("companyId", user?.company || "unknown");
+    fd.append("folder", "products");
     setIsUploading(true);
     setUploadProgress(20);
     try {
@@ -182,7 +183,7 @@ export default function ProductFormModal({ open, onClose, product = null }) {
             <div className="flex flex-col sm:flex-row gap-5">
 
               {/* Image Uploader */}
-              <div className="sm:w-40 flex-shrink-0">
+              <div className="sm:w-40 shrink-0">
                 <p className="text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: "var(--muted)" }}>
                   Product Image
                 </p>

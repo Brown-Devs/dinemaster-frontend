@@ -16,7 +16,7 @@ export async function POST(req) {
         const formData = await req.formData();
         const file = formData.get("file");
         const companyId = formData.get("companyId");
-        const existingKey = formData.get("key");
+        const folder = formData.get("folder") || "misc";
 
         if (!file || !companyId) {
             return Response.json({ error: "Missing fields" }, { status: 400 });
@@ -25,8 +25,7 @@ export async function POST(req) {
         const buffer = Buffer.from(await file.arrayBuffer());
         const safeName = file.name.replace(/\s+/g, "_");
 
-        const key = `dinemaster/${companyId}/${uuidv4()}-${safeName}`;
-        // const key = `${companyId}/assets/${new Date().getFullYear()}/${uuidv4()}-${safeName}`;
+        const key = `${folder}/${companyId}/${uuidv4()}-${safeName}`;
 
         await s3.send(new PutObjectCommand({
             Bucket: process.env.CLOUDFLARE_R2_BUCKET,
