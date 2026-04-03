@@ -5,23 +5,10 @@ export const USERTYPE = {
     EMPLOYEE: 'subadmin',
 }
 
-export const USER_DESIGNATIONS = {
-    SALES_MANAGER: 'Sales Manager',
-    SALES_EXECUTIVE: 'Sales Executive',
-    COMPANY: 'Company',
-    TEAM_LEADER: 'Team Leader',
-}
-
 export const DEVICE_TYPES = {
     MOBILE: 'mobile',
     DESKTOP: 'desktop',
     TABLET: 'tablet',
-}
-
-export const ATTENDANCE_STATUSES = {
-    ACTIVE: 'active',
-    INACTIVE: 'inactive',
-    BREAK: 'break'
 }
 
 export const ROLES = {

@@ -75,8 +75,7 @@ export default function Sidebar({
 
   const sections = useMemo(() => {
     if (!user) return [];
-
-    if (user.role === ROLES.ADMIN) {
+    if (user.systemRole === ROLES.ADMIN) {
       return [
         {
           label: "Companies",
@@ -88,7 +87,7 @@ export default function Sidebar({
           label: "Master Products",
           icon: <Inventory2 />,
           path: "/dashboard/masterProducts?page=1&limit=10",
-          // module: MODULES.BASE,
+          module: MODULES.BASE,
         },
       ];
     }

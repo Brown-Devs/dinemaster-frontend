@@ -38,7 +38,7 @@ export default function LoginPage() {
     const handleContinue = () => {
         if (!user) return;
 
-        if (user.role === USERTYPE.ADMIN) {
+        if (user.systemRole === USERTYPE.ADMIN) {
             router.push('/dashboard/companies');
         } else {
             router.push('/dashboard');
@@ -85,7 +85,7 @@ export default function LoginPage() {
             setAuth(userData, token, sessionId);
 
             // redirect to dashboard
-            if (userData.role === USERTYPE.ADMIN) {
+            if (userData.systemRole === USERTYPE.ADMIN) {
                 router.push('/dashboard/companies');
             } else {
                 router.push('/dashboard');

@@ -25,7 +25,7 @@ export default function MasterProductsTable({
   onPageChange,
 }) {
   const currentPage = apiData?.pagination?.page || 1;
-  const total = apiData?.totalCount || 0;
+  const total = apiData?.pagination?.totalCount || 0;
 
   if (loading) {
     return (
@@ -203,11 +203,13 @@ export default function MasterProductsTable({
       {/* Pagination */}
       <TablePagination
         component="div"
-        count={total}
-        page={currentPage - 1}
+        count={total || 0}
+        page={(currentPage || 1) - 1}
         onPageChange={(e, newPage) => onPageChange(newPage + 1)}
-        rowsPerPage={limit || 10}
-        onRowsPerPageChange={(e) => setLimit(parseInt(e.target.value, 10))}
+        rowsPerPage={limit}
+        onRowsPerPageChange={(e) =>
+          setLimit(parseInt(e.target.value, 10))
+        }
         rowsPerPageOptions={[5, 10, 25, 50]}
       />
     </div>

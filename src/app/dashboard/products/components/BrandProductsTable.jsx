@@ -37,7 +37,7 @@ export default function BrandProductsTable({
   const products = apiData?.products || [];
   const currentPage = apiData?.pagination?.page || 1;
   const total = apiData?.pagination?.totalCount || 0;
-
+  console.log(apiData)
   const handleSelectAll = (event) => {
     if (event.target.checked) {
       const newSelected = products.map((n) => n._id);
@@ -156,7 +156,7 @@ export default function BrandProductsTable({
                       <div className="flex flex-col">
                         <span className="font-semibold text-sm">{product.name}</span>
                         {product.description && (
-                            <span className="text-xs text-gray-400 line-clamp-1 max-w-[200px]">{product.description}</span>
+                          <span className="text-xs text-gray-400 line-clamp-1 max-w-[200px]">{product.description}</span>
                         )}
                       </div>
                     </TableCell>
@@ -189,9 +189,9 @@ export default function BrandProductsTable({
                           <Chip label="Inactive" color="error" size="small" variant="tonal" sx={{ height: 20, fontSize: "10px" }} />
                         )}
                         {product.inStock ? (
-                           <Chip label="In Stock" color="info" size="small" variant="tonal" sx={{ height: 20, fontSize: "10px" }} />
+                          <Chip label="In Stock" color="info" size="small" variant="tonal" sx={{ height: 20, fontSize: "10px" }} />
                         ) : (
-                           <Chip label="Out of Stock" color="warning" size="small" variant="tonal" sx={{ height: 20, fontSize: "10px" }} />
+                          <Chip label="Out of Stock" color="warning" size="small" variant="tonal" sx={{ height: 20, fontSize: "10px" }} />
                         )}
                       </div>
                     </TableCell>

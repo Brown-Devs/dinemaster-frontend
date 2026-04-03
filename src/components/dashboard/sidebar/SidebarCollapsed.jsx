@@ -112,7 +112,7 @@ export default function SidebarCollapsed({ onOpenFull }) {
   const sections = useMemo(() => {
     if (!user) return [];
 
-    if (user.role === ROLES.ADMIN) {
+    if (user.systemRole === ROLES.ADMIN) {
       return [
         {
           label: "Companies",

@@ -138,7 +138,7 @@ export default function MasterProductsPage() {
 
         <MasterProductsTable
           apiData={apiData}
-          products={apiData}
+          products={apiData.masterProducts}
           loading={masterProductsData.isLoading}
           limit={limit}
           setLimit={(val) => updateParams({ limit: val, page: 1 })}
