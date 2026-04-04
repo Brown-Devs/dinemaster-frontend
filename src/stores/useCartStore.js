@@ -9,7 +9,7 @@ export const useCartStore = create(
       customerDetails: null, // Legacy
       customerName: "",
       customerMobile: "",
-      orderType: "dinein", // dinein, pack, delivery
+      orderType: "dinein", // dinein, packing, delivery
       paymentStatus: "not_paid", // not_paid, paid
       paymentMode: "cash", // cash, online, mix
       payments: {

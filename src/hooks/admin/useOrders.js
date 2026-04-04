@@ -52,6 +52,19 @@ export const useOrders = () => {
         }
     });
 
+    // 4. Fetch Order Statistics
+    const statsQuery = (options = {}) => {
+        return useQuery({
+            queryKey: ["orders", "stats"],
+            queryFn: async () => {
+                const response = await api.get(`/orders/stats`);
+                return response.data;
+            },
+            staleTime: 1000 * 60 * 5, // 5 mins
+            ...options
+        });
+    };
+
     // 4. Fetch Kitchen Orders (Infinite scroll with counts)
     const kitchenOrdersQuery = (params = {}) => {
         const { page, ...restParams } = params;
@@ -80,6 +93,7 @@ export const useOrders = () => {
         createOrderMutation,
         ordersQuery,
         kitchenOrdersQuery,
-        updateOrderMutation
+        updateOrderMutation,
+        statsQuery
     };
 };

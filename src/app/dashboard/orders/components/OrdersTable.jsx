@@ -34,15 +34,23 @@ import { format } from "date-fns";
 import { TablePagination } from "@mui/material";
 
 const statusColors = {
-  new: { bg: "rgba(33, 150, 243, 0.1)", text: "#2196f3", label: "New" },
-  delivered: { bg: "rgba(76, 175, 80, 0.1)", text: "#4caf50", label: "Delivered" },
-  cancelled: { bg: "rgba(244, 67, 54, 0.1)", text: "#f44336", label: "Cancelled" },
+  new: { bg: "#e3f2fd", text: "#1976d2", label: "New" },
+  prepared: { bg: "#fff3e0", text: "#ef6c00", label: "Prepared" },
+  out_for_delivery: { bg: "#f3e5f5", text: "#7b1fa2", label: "Out for Delivery" },
+  delivered: { bg: "#e8f5e9", text: "#2e7d32", label: "Delivered" },
+  cancelled: { bg: "#ffebee", text: "#d32f2f", label: "Cancelled" },
 };
 
 const typeIcons = {
   dinein: <FastfoodIcon fontSize="small" />,
-  homeDelivery: <LocalShippingIcon fontSize="small" />,
+  delivery: <LocalShippingIcon fontSize="small" />,
   packing: <ShoppingBagIcon fontSize="small" />,
+};
+
+const typeLabels = {
+  dinein: "Dine In",
+  delivery: "Delivery",
+  packing: "Packing",
 };
 
 export default function OrdersTable({
@@ -59,9 +67,20 @@ export default function OrdersTable({
 }) {
 
   return (
-    <Box>
-      <TableContainer component={Paper} elevation={0} sx={{ bgcolor: "transparent", border: "1px solid var(--border)", borderRadius: "6px", overflow: 'hidden' }}>
-        <Table sx={{ minWidth: 800 }}>
+    <Box sx={{ width: '100%', overflow: 'hidden' }}>
+      <TableContainer 
+        component={Paper} 
+        elevation={0} 
+        sx={{ 
+          bgcolor: "transparent", 
+          border: "1px solid var(--border)", 
+          borderRadius: "6px", 
+          overflowX: 'auto',
+          '&::-webkit-scrollbar': { height: '6px' },
+          '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(0,0,0,0.1)', borderRadius: '10px' }
+        }}
+      >
+        <Table sx={{ minWidth: 1000 }}>
           <TableHead sx={{ bgcolor: "var(--cardsBG)" }}>
             <TableRow>
               <TableCell sx={{ fontWeight: 'bold', color: 'var(--muted)', width: 80, textAlign: 'center', px: 4 }}>S.No</TableCell>
@@ -115,8 +134,8 @@ export default function OrdersTable({
                        <span style={{ color: 'var(--muted)', display: 'flex' }}>
                          {typeIcons[order.orderType] || <FastfoodIcon fontSize="small" />}
                        </span>
-                       <Typography variant="caption" sx={{ color: "var(--muted)", textTransform: 'capitalize' }}>
-                         {order.orderType === 'homeDelivery' ? 'Delivery' : order.orderType}
+                       <Typography variant="caption" sx={{ color: "var(--muted)", fontWeight: "bold" }}>
+                         {typeLabels[order.orderType] || order.orderType}
                        </Typography>
                     </div>
                   </TableCell>

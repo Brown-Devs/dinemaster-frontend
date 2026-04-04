@@ -78,6 +78,8 @@ export default function OrdersFilterDrawer({ open, onClose, filters, onApply, on
                 >
                   <MenuItem value="">All Statuses</MenuItem>
                   <MenuItem value="new">New</MenuItem>
+                  <MenuItem value="prepared">Prepared</MenuItem>
+                  <MenuItem value="out_for_delivery">Out for Delivery</MenuItem>
                   <MenuItem value="delivered">Delivered</MenuItem>
                   <MenuItem value="cancelled">Cancelled</MenuItem>
                 </Select>
@@ -92,8 +94,8 @@ export default function OrdersFilterDrawer({ open, onClose, filters, onApply, on
                   onChange={(e) => handleChange("orderType", e.target.value)}
                 >
                   <MenuItem value="">All Types</MenuItem>
-                  <MenuItem value="dinein">Dine-in</MenuItem>
-                  <MenuItem value="homeDelivery">Home Delivery</MenuItem>
+                  <MenuItem value="dinein">Dine In</MenuItem>
+                  <MenuItem value="delivery">Delivery</MenuItem>
                   <MenuItem value="packing">Packing</MenuItem>
                 </Select>
               </FormControl>
