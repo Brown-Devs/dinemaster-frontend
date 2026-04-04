@@ -45,43 +45,30 @@ const typeIcons = {
   packing: <ShoppingBagIcon fontSize="small" />,
 };
 
-export default function OrdersTable({ 
-  orders, 
-  loading, 
-  total, 
-  page, 
-  limit, 
-  onPageChange, 
+export default function OrdersTable({
+  orders,
+  loading,
+  total,
+  page,
+  limit,
+  onPageChange,
   setLimit,
-  onUpdateStatus, 
+  onUpdateStatus,
   onUpdatePayment,
   onViewDetails
 }) {
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [selectedOrder, setSelectedOrder] = React.useState(null);
-
-  const handleMenuOpen = (event, order) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedOrder(order);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setSelectedOrder(null);
-  };
-
-  const totalPages = Math.ceil(total / limit);
 
   return (
     <Box>
-      <TableContainer component={Paper} elevation={0} sx={{ bgcolor: "transparent", border: "1px solid var(--border)", borderRadius: "16px", overflow: 'hidden' }}>
+      <TableContainer component={Paper} elevation={0} sx={{ bgcolor: "transparent", border: "1px solid var(--border)", borderRadius: "6px", overflow: 'hidden' }}>
         <Table sx={{ minWidth: 800 }}>
           <TableHead sx={{ bgcolor: "var(--cardsBG)" }}>
             <TableRow>
-              <TableCell sx={{ fontWeight: 'bold', color: 'var(--muted)', width: 80, textAlign: 'center', px: 4 }}>Sr No</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', color: 'var(--muted)', width: 80, textAlign: 'center', px: 4 }}>S.No</TableCell>
               <TableCell sx={{ fontWeight: 'bold', color: 'var(--muted)' }}>Order ID</TableCell>
               <TableCell sx={{ fontWeight: 'bold', color: 'var(--muted)' }}>Customer</TableCell>
-              <TableCell sx={{ fontWeight: 'bold', color: 'var(--muted)' }}>Details</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', color: 'var(--muted)' }}>Type</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', color: 'var(--muted)' }}>Items</TableCell>
               <TableCell sx={{ fontWeight: 'bold', color: 'var(--muted)' }}>Amount</TableCell>
               <TableCell sx={{ fontWeight: 'bold', color: 'var(--muted)' }}>Status</TableCell>
               <TableCell sx={{ fontWeight: 'bold', color: 'var(--muted)' }}>Payment</TableCell>
@@ -100,7 +87,7 @@ export default function OrdersTable({
             ) : orders.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={8} align="center" sx={{ py: 10 }}>
-                   <Typography variant="body1" sx={{ color: "var(--muted)" }}>No orders found.</Typography>
+                  <Typography variant="body1" sx={{ color: "var(--muted)" }}>No orders found.</Typography>
                 </TableCell>
               </TableRow>
             ) : (
@@ -125,31 +112,31 @@ export default function OrdersTable({
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                       <Tooltip title={order.orderType}>
-                          <span style={{ color: 'var(--muted)' }}>{typeIcons[order.orderType] || order.orderType}</span>
-                       </Tooltip>
-                       <Typography variant="caption" sx={{ color: "var(--muted)" }}>
-                         {order.items?.length || 0} items
+                       <span style={{ color: 'var(--muted)', display: 'flex' }}>
+                         {typeIcons[order.orderType] || <FastfoodIcon fontSize="small" />}
+                       </span>
+                       <Typography variant="caption" sx={{ color: "var(--muted)", textTransform: 'capitalize' }}>
+                         {order.orderType === 'homeDelivery' ? 'Delivery' : order.orderType}
                        </Typography>
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="body2" sx={{ color: "var(--muted)" }}>
+                      {order.items?.length || 0} items
+                    </Typography>
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2" fontWeight="bold" sx={{ color: "var(--fg)" }}>
                       ₹{order.totalAmount}
                     </Typography>
-                    {order.additionalDiscount > 0 && (
-                      <Typography variant="caption" sx={{ color: "success.main", display: 'block' }}>
-                        -₹{order.additionalDiscount} disc
-                      </Typography>
-                    )}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
-                      <Chip 
+                      <Chip
                         label={statusColors[order.status]?.label || order.status}
                         size="small"
-                        sx={{ 
-                          bgcolor: statusColors[order.status]?.bg, 
+                        sx={{
+                          bgcolor: statusColors[order.status]?.bg,
                           color: statusColors[order.status]?.text,
                           fontWeight: 'bold',
                           borderRadius: '6px'
@@ -162,7 +149,7 @@ export default function OrdersTable({
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
-                      <Chip 
+                      <Chip
                         label={order.paymentStatus === 'paid' ? "Paid" : "Unpaid"}
                         variant="outlined"
                         size="small"
@@ -174,7 +161,7 @@ export default function OrdersTable({
                       </IconButton>
                     </div>
                     <Typography variant="caption" sx={{ color: "var(--muted)", display: 'block', mt: 0.5, fontSize: 10 }}>
-                       {order.paymentMode?.toUpperCase()}
+                      {order.paymentMode?.toUpperCase()}
                     </Typography>
                   </TableCell>
                   <TableCell align="center" sx={{ px: 4 }}>
@@ -184,9 +171,6 @@ export default function OrdersTable({
                           <VisibilityIcon fontSize="small" sx={{ color: "var(--muted)" }} />
                         </IconButton>
                       </Tooltip>
-                      <IconButton size="small" onClick={(e) => handleMenuOpen(e, order)}>
-                        <MoreVertIcon fontSize="small" sx={{ color: "var(--muted)" }} />
-                      </IconButton>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -214,26 +198,6 @@ export default function OrdersTable({
         />
       )}
 
-      {/* Action Menu */}
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-        PaperProps={{ sx: { borderRadius: 2, mt: 1, minWidth: 180, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' } }}
-      >
-        <MenuItem onClick={() => { onUpdateStatus(selectedOrder); handleMenuClose(); }} disabled={selectedOrder?.status === 'cancelled'}>
-          <ListItemIcon><CheckCircleIcon fontSize="small" /></ListItemIcon>
-          <ListItemText primary="Update Status" />
-        </MenuItem>
-        <MenuItem onClick={() => { onUpdatePayment(selectedOrder); handleMenuClose(); }} disabled={selectedOrder?.status === 'cancelled'}>
-          <ListItemIcon><PaymentIcon fontSize="small" /></ListItemIcon>
-          <ListItemText primary="Payment Details" />
-        </MenuItem>
-        <MenuItem onClick={handleMenuClose}>
-          <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
-          <ListItemText primary="View Details" />
-        </MenuItem>
-      </Menu>
     </Box>
   );
 }

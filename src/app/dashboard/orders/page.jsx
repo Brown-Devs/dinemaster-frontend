@@ -25,6 +25,7 @@ import OrdersTable from "./components/OrdersTable";
 import OrdersFilterDrawer from "./components/OrdersFilterDrawer";
 import { UpdateStatusDialog } from "./components/UpdateStatusDialog";
 import { UpdatePaymentDialog } from "./components/UpdatePaymentDialog";
+import { ViewOrderDialog } from "./components/ViewOrderDialog";
 import { format, subDays } from "date-fns";
 
 export default function OrdersPage() {
@@ -109,7 +110,7 @@ export default function OrdersPage() {
 
   const ordersData = ordersQuery(currentFilters);
   const apiData = ordersData.data?.data || { orders: [], totalCount: 0 };
-  console.log(apiData.orders)
+
   const handleOpenStatus = (order) => setUpdateModal({ open: true, type: 'status', order });
   const handleOpenPayment = (order) => setUpdateModal({ open: true, type: 'payment', order });
   const handleViewDetails = (order) => setViewModal({ open: true, order });
@@ -242,6 +243,14 @@ export default function OrdersPage() {
           open={true}
           onClose={() => setUpdateModal({ ...updateModal, open: false })}
           order={updateModal.order}
+        />
+      )}
+
+      {viewModal.open && viewModal.order && (
+        <ViewOrderDialog
+          open={true}
+          onClose={() => setViewModal({ ...viewModal, open: false })}
+          order={viewModal.order}
         />
       )}
 

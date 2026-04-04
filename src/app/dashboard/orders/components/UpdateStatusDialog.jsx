@@ -52,7 +52,7 @@ export function UpdateStatusDialog({ open, onClose, order }) {
             onChange={(e) => setStatus(e.target.value)}
             label="Status"
           >
-            <MenuItem value="new">New / Processing</MenuItem>
+            <MenuItem value="new">New</MenuItem>
             <MenuItem value="delivered">Delivered</MenuItem>
             <MenuItem value="cancelled" disabled={isDelivered}>Cancelled</MenuItem>
           </Select>
