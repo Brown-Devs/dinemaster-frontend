@@ -29,13 +29,13 @@ export default function BillingPage() {
   const products = productsData.data?.data?.data?.products || productsData.data?.data?.data || [];
   const categories = categoriesData.data?.data?.data?.categories || categoriesData.data?.data?.data || [];
 
-  const { 
-    cart, 
-    discountAmount, 
-    customerName, 
-    customerMobile, 
-    orderType, 
-    paymentStatus, 
+  const {
+    cart,
+    discountAmount,
+    customerName,
+    customerMobile,
+    orderType,
+    paymentStatus,
     payments,
     clearCart,
     getCartTotal
@@ -128,7 +128,7 @@ export default function BillingPage() {
                   </Button>
                 </div>
                 <div className="flex-1 overflow-hidden">
-                  <CartSidebar hideConfirm />
+                  <CartSidebar hideConfirm readOnly />
                 </div>
               </div>
             </div>
@@ -147,12 +147,12 @@ export default function BillingPage() {
                 <Button
                   variant="contained"
                   size="large"
-                  disabled={createOrderMutation.isLoading}
-                  startIcon={createOrderMutation.isLoading ? <CircularProgress size={20} color="inherit" /> : <CheckCircleIcon />}
+                  disabled={createOrderMutation.isPending}
+                  startIcon={createOrderMutation.isPending ? <CircularProgress size={20} color="inherit" /> : <CheckCircleIcon />}
                   onClick={handlePlaceOrder}
                   sx={{ px: 8, py: 1.5, borderRadius: 3, fontWeight: '900', fontSize: 18, textTransform: 'none', boxShadow: 4 }}
                 >
-                  {createOrderMutation.isLoading ? "Creating Order..." : "Complete Order"}
+                  {createOrderMutation.isPending ? "Creating Order..." : "Complete Order"}
                 </Button>
               </div>
             </div>
@@ -161,10 +161,10 @@ export default function BillingPage() {
 
         {step === 3 && (
           <div className="flex-1 h-full flex items-center justify-center">
-             <OrderSuccessView 
-               order={orderResult}
-               onNewOrder={handleNewOrder}
-             />
+            <OrderSuccessView
+              order={orderResult}
+              onNewOrder={handleNewOrder}
+            />
           </div>
         )}
 

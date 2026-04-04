@@ -53,6 +53,8 @@ export function UpdateStatusDialog({ open, onClose, order }) {
             label="Status"
           >
             <MenuItem value="new">New</MenuItem>
+            <MenuItem value="prepared">Prepared</MenuItem>
+            <MenuItem value="out_for_delivery">Out for Delivery</MenuItem>
             <MenuItem value="delivered">Delivered</MenuItem>
             <MenuItem value="cancelled" disabled={isDelivered}>Cancelled</MenuItem>
           </Select>

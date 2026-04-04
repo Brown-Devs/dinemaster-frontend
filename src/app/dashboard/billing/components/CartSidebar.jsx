@@ -9,7 +9,7 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useCartStore } from "@/stores/useCartStore";
 
-export default function CartSidebar({ onConfirm, confirmText = "Confirm Order", hideConfirm = false }) {
+export default function CartSidebar({ onConfirm, confirmText = "Confirm Order", hideConfirm = false, readOnly = false }) {
   const { cart, updateQuantity, removeFromCart, discountAmount, setDiscount } = useCartStore();
 
   const subtotal = cart.reduce((sum, item) => sum + (item.pricePerItem * item.quantity), 0);
@@ -73,26 +73,32 @@ export default function CartSidebar({ onConfirm, confirmText = "Confirm Order", 
               </div>
 
               <div className="flex justify-between items-center mt-2">
-                <div className="flex items-center bg-card border border-border rounded-full shadow-sm overflow-hidden h-6">
-                  <button 
-                    onClick={() => updateQuantity(item.cartId, -1)}
-                    className="w-6 h-6 flex items-center justify-center hover:bg-cardsBG transition-colors"
-                  >
-                    <RemoveIcon sx={{ fontSize: 12, color: "var(--fg)" }} />
-                  </button>
-                  <span className="w-5 text-center text-xs font-bold" style={{ color: "var(--fg)" }}>
-                    {item.quantity}
+                <div className={`flex items-center bg-card border border-border rounded-full shadow-sm overflow-hidden h-6 ${readOnly ? 'opacity-80' : ''}`}>
+                  {!readOnly && (
+                    <button 
+                      onClick={() => updateQuantity(item.cartId, -1)}
+                      className="w-6 h-6 flex items-center justify-center hover:bg-cardsBG transition-colors"
+                    >
+                      <RemoveIcon sx={{ fontSize: 12, color: "var(--fg)" }} />
+                    </button>
+                  )}
+                  <span className={`${readOnly ? 'px-3' : 'w-5'} text-center text-xs font-bold`} style={{ color: "var(--fg)" }}>
+                    {readOnly ? `Qty: ${item.quantity}` : item.quantity}
                   </span>
-                  <button 
-                    onClick={() => updateQuantity(item.cartId, 1)}
-                    className="w-6 h-6 flex items-center justify-center hover:bg-cardsBG transition-colors bg-green-500/10 text-green-600"
-                  >
-                    <AddIcon sx={{ fontSize: 12 }} />
-                  </button>
+                  {!readOnly && (
+                    <button 
+                      onClick={() => updateQuantity(item.cartId, 1)}
+                      className="w-6 h-6 flex items-center justify-center hover:bg-cardsBG transition-colors bg-green-500/10 text-green-600"
+                    >
+                      <AddIcon sx={{ fontSize: 12 }} />
+                    </button>
+                  )}
                 </div>
-                <IconButton size="small" onClick={() => removeFromCart(item.cartId)} sx={{ color: 'var(--muted)', '&:hover': { color: 'error.main'}, p: 0.5 }}>
-                  <DeleteOutlineIcon fontSize="small" />
-                </IconButton>
+                {!readOnly && (
+                  <IconButton size="small" onClick={() => removeFromCart(item.cartId)} sx={{ color: 'var(--muted)', '&:hover': { color: 'error.main'}, p: 0.5 }}>
+                    <DeleteOutlineIcon fontSize="small" />
+                  </IconButton>
+                )}
               </div>
             </div>
           </div>
@@ -109,14 +115,20 @@ export default function CartSidebar({ onConfirm, confirmText = "Confirm Order", 
           <span style={{ color: "var(--muted)" }}>Additional Discount</span>
           <div className="flex items-center gap-1">
             <span style={{ color: "var(--muted)" }}>₹</span>
-            <input 
-              type="number"
-              min="0"
-              value={discountAmount || ''}
-              onChange={(e) => setDiscount(Number(e.target.value))}
-              className="w-16 bg-card border border-border rounded px-1 py-0.5 text-right font-medium text-[color:var(--fg)] outline-none focus:border-primary"
-              placeholder="0"
-            />
+            {readOnly ? (
+              <Typography variant="body2" fontWeight="bold" sx={{ color: "var(--fg)", minWidth: '40px', textAlign: 'right' }}>
+                {discountAmount || 0}
+              </Typography>
+            ) : (
+              <input 
+                type="number"
+                min="0"
+                value={discountAmount || ''}
+                onChange={(e) => setDiscount(Number(e.target.value))}
+                className="w-16 bg-card border border-border rounded px-1 py-0.5 text-right font-medium text-[color:var(--fg)] outline-none focus:border-primary"
+                placeholder="0"
+              />
+            )}
           </div>
         </div>
         

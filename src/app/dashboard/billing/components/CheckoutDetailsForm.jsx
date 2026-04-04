@@ -123,8 +123,8 @@ export default function CheckoutDetailsForm() {
               <ToggleButton value="dinein" sx={{ borderRadius: "12px 0 0 12px", textTransform: 'none', fontWeight: 'bold' }}>
                 Dine In
               </ToggleButton>
-              <ToggleButton value="pack" sx={{ textTransform: 'none', fontWeight: 'bold' }}>
-                Take Away
+              <ToggleButton value="packing" sx={{ textTransform: 'none', fontWeight: 'bold' }}>
+                Packing
               </ToggleButton>
               <ToggleButton value="delivery" sx={{ borderRadius: "0 12px 12px 0", textTransform: 'none', fontWeight: 'bold' }}>
                 Delivery

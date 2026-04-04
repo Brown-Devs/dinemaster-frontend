@@ -19,6 +19,10 @@ import TodayIcon from "@mui/icons-material/Today";
 import HistoryIcon from "@mui/icons-material/History";
 import PaymentsIcon from "@mui/icons-material/Payments";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import ChevronDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import ChevronUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import { Tooltip } from "@mui/material";
+import { useQueryClient } from "@tanstack/react-query";
 import { useOrders } from "@/hooks/admin/useOrders";
 import { useDebounce } from "@/hooks/useDebounce";
 import OrdersTable from "./components/OrdersTable";
@@ -27,6 +31,7 @@ import { UpdateStatusDialog } from "./components/UpdateStatusDialog";
 import { UpdatePaymentDialog } from "./components/UpdatePaymentDialog";
 import { ViewOrderDialog } from "./components/ViewOrderDialog";
 import { format, subDays } from "date-fns";
+import OrdersSummary from "./components/OrdersSummary";
 
 export default function OrdersPage() {
   const router = useRouter();
@@ -54,6 +59,19 @@ export default function OrdersPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [updateModal, setUpdateModal] = useState({ open: false, type: null, order: null });
   const [viewModal, setViewModal] = useState({ open: false, order: null });
+
+  // Persistent Collapse State for Statistics
+  const [isExpanded, setIsExpanded] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('dinemaster_orders_stats_expanded');
+      return saved !== null ? JSON.parse(saved) : true;
+    }
+    return true;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('dinemaster_orders_stats_expanded', JSON.stringify(isExpanded));
+  }, [isExpanded]);
 
   // Sync Search Input with URL
   useEffect(() => {
@@ -111,67 +129,80 @@ export default function OrdersPage() {
   const ordersData = ordersQuery(currentFilters);
   const apiData = ordersData.data?.data || { orders: [], totalCount: 0 };
 
+  // Use QueryClient to selectively refetch stats
+  const queryClient = useQueryClient();
+
+  const handleRefresh = () => {
+    ordersData.refetch();
+    if (isExpanded) {
+      queryClient.invalidateQueries({ queryKey: ["orders", "stats"] });
+    }
+  };
+
   const handleOpenStatus = (order) => setUpdateModal({ open: true, type: 'status', order });
   const handleOpenPayment = (order) => setUpdateModal({ open: true, type: 'payment', order });
   const handleViewDetails = (order) => setViewModal({ open: true, order });
 
   return (
     <InnerDashboardLayout>
-      <Box sx={{ mb: 4, mt: 2 }}>
-        <div className="flex justify-between items-start flex-wrap gap-4">
+      <Box sx={{ mb: 2, mt: 1 }}>
+        <div className="flex justify-between items-start flex-wrap gap-4 mb-3">
           <div>
             <h1 className="font-bold text-3xl tracking-tight">Order Management</h1>
             <p style={{ color: "var(--muted)" }}>
               Search, filter, and manage all your restaurant bookings and sales.
             </p>
           </div>
-          <IconButton onClick={() => ordersData.refetch()} sx={{ bgcolor: "var(--cardsBG)", border: "1px solid var(--border)" }}>
-            <RefreshIcon sx={{ color: "var(--muted)" }} />
-          </IconButton>
+          
+          <div className="flex items-center gap-2">
+            <Tooltip title="Refresh Everything">
+              <IconButton 
+                onClick={handleRefresh} 
+                sx={{ 
+                  bgcolor: "var(--cardsBG)", 
+                  border: "1px solid var(--border)",
+                  borderRadius: "0.75rem",
+                  transition: "all 0.2s",
+                  "&:hover": { transform: "rotate(45deg)", color: "var(--primary)" }
+                }}
+              >
+                <RefreshIcon sx={{ fontSize: 20 }} />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title={isExpanded ? "Collapse Summary" : "Expand Summary"}>
+              <IconButton 
+                onClick={() => setIsExpanded(!isExpanded)} 
+                sx={{ 
+                  bgcolor: "var(--cardsBG)", 
+                  border: "1px solid var(--border)",
+                  borderRadius: "0.75rem"
+                }}
+              >
+                {isExpanded ? <ChevronUpIcon sx={{ fontSize: 20 }} /> : <ChevronDownIcon sx={{ fontSize: 20 }} />}
+              </IconButton>
+            </Tooltip>
+          </div>
         </div>
 
-        {/* Quick Filters */}
-        <Stack direction="row" spacing={2} sx={{ mt: 4, flexWrap: "wrap", gap: 1 }}>
-          <Button
-            variant={fromDate === format(new Date(), "yyyy-MM-dd") ? "contained" : "outlined"}
-            startIcon={<TodayIcon />}
-            onClick={handleTodayOrders}
-            size="small"
-            sx={{ borderRadius: 2, textTransform: 'none' }}
-          >
-            Today's Orders
-          </Button>
-          <Button
-            variant={fromDate === format(subDays(new Date(), 1), "yyyy-MM-dd") ? "contained" : "outlined"}
-            startIcon={<HistoryIcon />}
-            onClick={handleYesterdayOrders}
-            size="small"
-            sx={{ borderRadius: 2, textTransform: 'none' }}
-          >
-            Yesterday
-          </Button>
-          <Button
-            variant={paymentStatus === "not_paid" ? "contained" : "outlined"}
-            startIcon={<PaymentsIcon />}
-            onClick={handleUnpaidOrders}
-            size="small"
-            sx={{ borderRadius: 2, textTransform: 'none' }}
-          >
-            Unpaid Orders
-          </Button>
+        {/* Statistics Summary Section */}
+        <OrdersSummary isExpanded={isExpanded} />
 
-          {(status || orderType || paymentStatus || paymentMode || fromDate || toDate) && (
+        {/* Clear Filters if any applied */}
+        {(status || orderType || paymentStatus || paymentMode || fromDate || toDate) && (
+          <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
             <Button
               variant="text"
               onClick={() => router.replace('?')}
               color="error"
               size="small"
               sx={{ textTransform: 'none' }}
+              startIcon={<FilterListIcon />}
             >
               Clear All Filters
             </Button>
-          )}
-        </Stack>
+          </Box>
+        )}
       </Box>
 
       {/* Main Content Card */}
