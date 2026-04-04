@@ -8,13 +8,20 @@ import {
   TextField,
   Tooltip,
   InputAdornment,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  IconButton,
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from "@mui/icons-material/Search";
+import ClearIcon from "@mui/icons-material/Clear";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMasterProducts } from "@/hooks/superAdmin/useMasterProducts";
 import MasterProductsTable from "./components/MasterProductsTable";
+import MasterProductFormModal from "./components/MasterProductFormModal";
 
 export default function MasterProductsPage() {
   const router = useRouter();
@@ -23,13 +30,21 @@ export default function MasterProductsPage() {
   const page = Number(searchParams.get("page")) || 1;
   const limit = Number(searchParams.get("limit")) || 10;
   const search = searchParams.get("search") || "";
+  const category = searchParams.get("category") || "";
 
   const [searchInput, setSearchInput] = useState(search);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
+
+  const { masterProductsQuery, masterCategoriesQuery } = useMasterProducts();
+  const { data: catData } = masterCategoriesQuery();
+  const categories = catData?.data || [];
 
   const updateParams = (newParams) => {
     const params = new URLSearchParams(searchParams.toString());
     Object.entries(newParams).forEach(([key, value]) => {
-      if (!value) {
+      if (value === undefined || value === null || value === "") {
         params.delete(key);
       } else {
         params.set(key, value);
@@ -60,16 +75,38 @@ export default function MasterProductsPage() {
       page,
       limit,
       ...(search ? { search } : {}),
+      ...(category ? { category } : {}),
     }),
-    [page, limit, search]
+    [page, limit, search, category]
   );
 
-  const { masterProductsQuery } = useMasterProducts();
   const masterProductsData = masterProductsQuery(queryParams);
   const apiData = masterProductsData?.data?.data?.data || {
     masterProducts: [],
     pagination: { page: 1, limit: 10 },
     totalCount: 0,
+  };
+
+  const handleOpenAdd = () => {
+    setEditingProduct(null);
+    setModalOpen(true);
+  };
+
+  const handleOpenEdit = (product) => {
+    setEditingProduct(product);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setEditingProduct(null);
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm("Are you sure you want to delete this master product?")) {
+      // Logic for deletion if implemented in hook, or just a placeholder for now
+      toast.error("Delete functionality not yet fully linked to backend mutation");
+    }
   };
 
   return (
@@ -106,7 +143,7 @@ export default function MasterProductsPage() {
               <Button
                 variant="outlined"
                 startIcon={<AddIcon />}
-              // onClick={() => setDialogOpen(true)}
+                onClick={handleOpenAdd}
               >
                 Add New
               </Button>
@@ -117,12 +154,29 @@ export default function MasterProductsPage() {
 
       {/* Table Card */}
       <div className="bg-card p-3 sm:p-6 border border-border rounded-xl w-full">
+        {/* Bulk Actions (Optional UI alignment) */}
+        {selectedIds.length > 0 && (
+          <div className="mb-4 p-2 bg-blue-50 border border-blue-100 rounded-lg flex items-center justify-between">
+            <span className="text-sm font-medium text-blue-700">
+              {selectedIds.length} item(s) selected
+            </span>
+            <Button
+              size="small"
+              color="error"
+              variant="tonal"
+              startIcon={<ClearIcon />}
+              onClick={() => setSelectedIds([])}
+            >
+              Clear Selection
+            </Button>
+          </div>
+        )}
 
-        {/* Search Bar */}
-        <div className="mb-4">
+        {/* Filters Area */}
+        <div className="flex flex-col sm:flex-row gap-3 mb-4">
           <TextField
             size="small"
-            fullWidth
+            className="flex-[2]"
             placeholder="Search products..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
@@ -132,8 +186,33 @@ export default function MasterProductsPage() {
                   <SearchIcon sx={{ color: "#9CA3AF" }} />
                 </InputAdornment>
               ),
+              endAdornment: searchInput && (
+                <InputAdornment position="end">
+                  <IconButton size="small" onClick={() => setSearchInput("")}>
+                    <ClearIcon fontSize="small" />
+                  </IconButton>
+                </InputAdornment>
+              ),
             }}
           />
+
+          <FormControl size="small" className="flex-1 min-w-[200px]">
+            <InputLabel>Category</InputLabel>
+            <Select
+              value={category}
+              label="Category"
+              onChange={(e) => updateParams({ category: e.target.value, page: 1 })}
+            >
+              <MenuItem value="">
+                <em>All Categories</em>
+              </MenuItem>
+              {categories.map((cat) => (
+                <MenuItem key={cat} value={cat}>
+                  {cat}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </div>
 
         <MasterProductsTable
@@ -143,8 +222,18 @@ export default function MasterProductsPage() {
           limit={limit}
           setLimit={(val) => updateParams({ limit: val, page: 1 })}
           onPageChange={(p) => updateParams({ page: p })}
+          onEdit={handleOpenEdit}
+          onDelete={handleDelete}
+          selectedIds={selectedIds}
+          onSelectChange={setSelectedIds}
         />
       </div>
+
+      <MasterProductFormModal
+        open={modalOpen}
+        onClose={handleCloseModal}
+        product={editingProduct}
+      />
     </InnerDashboardLayout>
   );
 }
