@@ -29,7 +29,7 @@ export default function ProductFormModal({ open, onClose, product = null }) {
   const { user } = useAuthStore();
   const { companyCategoriesQuery, createProductMutation, updateProductMutation } = useBrandProducts();
   const { data: catData } = companyCategoriesQuery();
-  const categories = catData?.data?.data || [];
+  const categories = catData?.data?.data?.categories || [];
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
@@ -122,7 +122,7 @@ export default function ProductFormModal({ open, onClose, product = null }) {
         const tid = toast.loading("Uploading image…");
         try {
           finalImageUrl = await uploadImage(selectedFile);
-          toast.success("Image uploaded", { id: tid });
+          toast.dismiss(tid);
         } catch {
           toast.error("Image upload failed", { id: tid });
           return;
@@ -131,14 +131,11 @@ export default function ProductFormModal({ open, onClose, product = null }) {
       const payload = { ...data, imageUrl: finalImageUrl };
       if (product?._id) {
         await updateProductMutation.mutateAsync({ id: product._id, data: payload });
-        toast.success("Product updated");
       } else {
         await createProductMutation.mutateAsync(payload);
-        toast.success("Product created");
       }
       onClose();
     } catch (err) {
-      toast.error(err?.response?.data?.message || "Something went wrong");
     }
   };
 

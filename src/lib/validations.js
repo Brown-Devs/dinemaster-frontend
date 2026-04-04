@@ -57,3 +57,13 @@ export const productSchema = z.object({
     discountedPrice: z.coerce.number().min(0, "Price must be positive").optional().or(z.literal(0))
   })).min(1, "At least one variant is required")
 });
+
+export const categorySchema = z.object({
+  name: z.string().min(2, "Category name is required"),
+  imageUrl: z.string().optional().or(z.literal("")),
+  active: z.boolean().default(true),
+  addOns: z.array(z.object({
+    name: z.string().min(1, "Add-on name is required"),
+    price: z.coerce.number().min(0, "Price must be positive")
+  })).optional()
+});
