@@ -141,37 +141,6 @@ export default function Sidebar({
       //   module: MODULES.WHATSAPP,
       //   permissions: PERMISSIONS.WHATSAPP_VIEW,
       // },
-     
-      {
-        label: "Reports",
-        icon: <AssessmentIcon />,
-        expandable: true,
-        children: [
-          {
-            label: "Today's Report",
-            path: "/dashboard/reports/today",
-            icon: <TodayIcon fontSize="small" />,
-        module: MODULES.REPORTS,
-            permissions: PERMISSIONS.REPORTS_VIEW,
-          },
-          {
-            label: "Performance",
-            path: "/dashboard/reports/performance",
-            icon: <TrendingUpIcon fontSize="small" />,
-        module: MODULES.REPORTS,
-            permissions: PERMISSIONS.REPORTS_VIEW,
-          },
-          {
-            label: "Overall Report",
-            path: "/dashboard/reports/overall",
-            icon: <AnalyticsIcon fontSize="small" />,
-        module: MODULES.REPORTS,
-            permissions: PERMISSIONS.REPORTS_VIEW,
-          },
-        ],
-        module: MODULES.REPORTS,
-        permissions: PERMISSIONS.REPORTS_VIEW,
-      },
       {
         label: "Staff",
         icon: <PeopleIcon />,

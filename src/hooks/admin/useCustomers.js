@@ -17,7 +17,27 @@ export const useCustomers = () => {
         });
     }
 
+    // 2. Fetch Paginated Customer List
+    const customersQuery = ({ page = 1, limit = 10, search = "" } = {}) => {
+        return useQuery({
+            queryKey: ['adminCustomers', { page, limit, search }],
+            queryFn: async () => {
+                const response = await api.get(`/customers/`, { 
+                    params: { 
+                        page, 
+                        limit, 
+                        searchQuery: search 
+                    } 
+                });
+                return response.data;
+            },
+            keepPreviousData: true,
+            staleTime: 1000 * 60, // 1 min
+        });
+    }
+
     return {
-        customerLookupQuery
+        customerLookupQuery,
+        customersQuery
     };
 };

@@ -180,33 +180,6 @@ export default function SidebarCollapsed({ onOpenFull }) {
       // },
 
       {
-        label: "Reports",
-        icon: <AssessmentIcon />,
-        expandable: true,
-        children: [
-          {
-            label: "Today's Report",
-            path: "/dashboard/reports/today",
-            icon: <TodayIcon fontSize="small" />,
-            module: MODULES.REPORTS,
-          },
-          {
-            label: "Performance",
-            path: "/dashboard/reports/performance",
-            icon: <TrendingUpIcon fontSize="small" />,
-            module: MODULES.REPORTS,
-          },
-          {
-            label: "Overall Report",
-            path: "/dashboard/reports/overall",
-            icon: <AnalyticsIcon fontSize="small" />,
-            module: MODULES.REPORTS,
-          },
-        ],
-        module: MODULES.REPORTS,
-        permissions: PERMISSIONS.REPORTS_VIEW,
-      },
-      {
         label: "Staff",
         icon: <PeopleIcon />,
         expandable: true,

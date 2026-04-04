@@ -44,9 +44,9 @@ export default function Navbar({ onDrawerToggle, onOpenTasks }) {
     const mode = useThemeStore((s) => s.mode)
     const setMode = useThemeStore((s) => s.setMode)
 
-      const { isHydrated } = useThemeStore();
-    
-      const logoSrc =
+    const { isHydrated } = useThemeStore();
+
+    const logoSrc =
         isHydrated && mode === "dark" ? "/logo2DT.png" : "/logo2L.png";
 
     const [profileAnchorEl, setProfileAnchorEl] = useState(null);
@@ -58,7 +58,7 @@ export default function Navbar({ onDrawerToggle, onOpenTasks }) {
     // const notifications = useNotificationStore(s => s.notifications)
     // const taskCount = notifications.filter(n =>
     // n.sourceType === "task" || (n.sourceType === "meeting" && getMeetingUrgency(n?.dueAt) >= -1)).length
-// const taskCount = notifications.length || 0;
+    // const taskCount = notifications.length || 0;
 
     return (
         <AppBar
@@ -76,9 +76,9 @@ export default function Navbar({ onDrawerToggle, onOpenTasks }) {
                 zIndex: 100
             }}
         >
-            <Toolbar 
-                className="flex justify-between" 
-                sx={{ 
+            <Toolbar
+                className="flex justify-between"
+                sx={{
                     minHeight: {
                         xs: 48,
                         sm: 48,
@@ -103,7 +103,7 @@ export default function Navbar({ onDrawerToggle, onOpenTasks }) {
                             edge="start"
                             onClick={onDrawerToggle}
                             sx={{ display: { md: 'none' } }}
-                            // size="small" // Use small size for mobile
+                        // size="small" // Use small size for mobile
                         >
                             <MenuIcon fontSize="small" />
                         </IconButton>
@@ -198,17 +198,17 @@ export default function Navbar({ onDrawerToggle, onOpenTasks }) {
                                         {user?.name || "User"}
                                     </Typography>
 
-                                    {/* <Typography variant="caption" color="text.secondary">
-                                        {getUserRoleLabel(roleLabels, user?.systemRole)}
-                                    </Typography> */}
+                                    <Typography variant="caption" color="text.secondary">
+                                        {user?.systemRole}
+                                    </Typography>
                                 </Box>
                             </Box>
                         </Box>
 
-                        <Divider />
+                        {/* <Divider /> */}
 
                         {/* VIEW PROFILE */}
-                        <MenuItem
+                        {/* <MenuItem
                             onClick={() => {
                                 handleProfileClose();
                                 router.push("/dashboard/myProfile");
@@ -221,7 +221,7 @@ export default function Navbar({ onDrawerToggle, onOpenTasks }) {
                             <ListItemText primary="View Profile" />
                         </MenuItem>
 
-                        <Divider />
+                        <Divider /> */}
 
                         {/* LOGOUT */}
                         {/* <MenuItem dense>
@@ -233,7 +233,7 @@ export default function Navbar({ onDrawerToggle, onOpenTasks }) {
                     <Tooltip title={mode === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}>
                         <IconButton
                             onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')}
-                            // size="small"
+                        // size="small"
                         >
                             {mode === 'dark' ? <WbSunnyIcon fontSize="small" /> : <Brightness4Icon fontSize="small" />}
                         </IconButton>
