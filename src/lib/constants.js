@@ -25,56 +25,44 @@ export const SYSTEM_ROLES = {
 }
 
 export const PERMISSIONS = {
+
+    // Dashboard
+    DASHBOARD_VIEW: "dashboard.view",
+
     // Orders
     ORDERS_VIEW: "orders.view",
-    ORDERS_CREATE: "orders.create",
     ORDERS_UPDATE: "orders.update",
-    ORDERS_DELETE: "orders.delete",
-    ORDERS_CANCEL: "orders.cancel",
-
-    // Reports
-    REPORTS_VIEW: "reports.view",
-    REPORTS_DOWNLOAD: "reports.download",
 
     // WhatsApp
-    WHATSAPP_VIEW: "whatsapp.view",
-    WHATSAPP_SEND: "whatsapp.send",
-    WHATSAPP_MANAGE_TEMPLATES: "whatsapp.manageTemplates",
+    // WHATSAPP_VIEW: "whatsapp.view",
+    // WHATSAPP_SEND: "whatsapp.send",
+    // WHATSAPP_MANAGE_TEMPLATES: "whatsapp.manageTemplates",
 
     // Products
     PRODUCTS_VIEW: "products.view",
     PRODUCTS_CREATE: "products.create",
     PRODUCTS_UPDATE: "products.update",
-    PRODUCTS_DELETE: "products.delete",
 
     // Categories
     CATEGORIES_VIEW: "categories.view",
     CATEGORIES_CREATE: "categories.create",
     CATEGORIES_UPDATE: "categories.update",
-    CATEGORIES_DELETE: "categories.delete",
-
-    // Settings
-    SETTINGS_VIEW: "settings.view",
-    SETTINGS_UPDATE: "settings.update",
 
     // Billing
     BILLING_VIEW: "billing.view",
     BILLING_CREATE: "billing.create",
-    BILLING_UPDATE: "billing.update",
-    BILLING_DELETE: "billing.delete",
-    BILLING_DOWNLOAD: "billing.download",
 
     // Customers
     CUSTOMERS_VIEW: "customers.view",
-    CUSTOMERS_CREATE: "customers.create",
-    CUSTOMERS_UPDATE: "customers.update",
-    CUSTOMERS_DELETE: "customers.delete",
 
     // Staff
     STAFF_VIEW: "staff.view",
     STAFF_CREATE: "staff.create",
     STAFF_UPDATE: "staff.update",
-    STAFF_DELETE: "staff.delete",
+
+    // Kitchen
+    KITCHEN_VIEW: "kitchen.view",
+    KITCHEN_UPDATE: "kitchen.update",
 };
 
 export const MODULES = {
@@ -88,6 +76,7 @@ export const MODULES = {
     SETTINGS: "modules.settings",
     BILLING: "modules.billing",
     CUSTOMERS: "modules.customers",
+    KITCHEN: "modules.kitchen",
 };
 
 

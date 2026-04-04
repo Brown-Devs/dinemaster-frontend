@@ -31,6 +31,8 @@ import {
   LocalActivityOutlined,
   LocationPin,
 } from "@mui/icons-material";
+import { UtensilsCrossed } from "lucide-react";
+
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import InsightsIcon from "@mui/icons-material/Insights";
 import ChatIcon from "@mui/icons-material/Chat";
@@ -142,6 +144,13 @@ export default function Sidebar({
       //   permissions: PERMISSIONS.WHATSAPP_VIEW,
       // },
       {
+        label: "Kitchen",
+        icon: <UtensilsCrossed size={20} />,
+        path: "/dashboard/kitchen",
+        module: MODULES.PRODUCTS,
+        permissions: PERMISSIONS.PRODUCTS_VIEW,
+      },
+      {
         label: "Staff",
         icon: <PeopleIcon />,
         expandable: true,
@@ -164,13 +173,13 @@ export default function Sidebar({
         module: MODULES.STAFF_BASE,
         permissions: PERMISSIONS.STAFF_VIEW,
       },
-      {
-        label: "Settings",
-        icon: <Settings />,
-        path: "/dashboard/settings",
-        module: MODULES.SETTINGS,
-        permissions: PERMISSIONS.SETTINGS_VIEW,
-      },
+      // {
+      //   label: "Settings",
+      //   icon: <Settings />,
+      //   path: "/dashboard/settings",
+      //   module: MODULES.SETTINGS,
+      //   permissions: PERMISSIONS.SETTINGS_VIEW,
+      // },
     ];
 
     return base;

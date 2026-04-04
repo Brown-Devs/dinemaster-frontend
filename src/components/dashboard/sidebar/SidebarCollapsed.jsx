@@ -74,6 +74,8 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import CategoryIcon from "@mui/icons-material/Category";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import { usePermissions } from "@/hooks/usePermissions";
+import { UtensilsCrossed } from "lucide-react";
+import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 
 const railWidth = 72;
 
@@ -180,6 +182,13 @@ export default function SidebarCollapsed({ onOpenFull }) {
       // },
 
       {
+        label: "Kitchen",
+        icon: <UtensilsCrossed size={18} />,
+        path: "/dashboard/kitchen",
+        module: MODULES.PRODUCTS,
+        permissions: PERMISSIONS.PRODUCTS_VIEW,
+      },
+      {
         label: "Staff",
         icon: <PeopleIcon />,
         expandable: true,
@@ -200,13 +209,13 @@ export default function SidebarCollapsed({ onOpenFull }) {
         module: MODULES.STAFF_BASE,
         permissions: PERMISSIONS.STAFF_VIEW,
       },
-      {
-        label: "Settings",
-        icon: <Settings />,
-        path: "/dashboard/settings",
-        module: MODULES.SETTINGS,
-        permissions: PERMISSIONS.SETTINGS_VIEW,
-      },
+      // {
+      //   label: "Settings",
+      //   icon: <Settings />,
+      //   path: "/dashboard/settings",
+      //   module: MODULES.SETTINGS,
+      //   permissions: PERMISSIONS.SETTINGS_VIEW,
+      // },
     ];
 
     return base;
@@ -294,7 +303,19 @@ export default function SidebarCollapsed({ onOpenFull }) {
       </Box>
 
       {/* FOOTER */}
-      <Box display="flex" justifyContent="center" pb={1}>
+      <Box 
+        display="flex" 
+        flexDirection="column" 
+        alignItems="center" 
+        pb={1} 
+        gap={1}
+      >
+        <Tooltip title="Expand Menu" placement="right">
+          <IconButton onClick={onOpenFull}>
+            <KeyboardDoubleArrowRightIcon />
+          </IconButton>
+        </Tooltip>
+
         <Tooltip title="Profile" placement="right">
           <IconButton onClick={(e) => setProfileAnchor(e.currentTarget)}>
             <Avatar src={user?.avatar || "/profile.jpg"} />
@@ -308,7 +329,7 @@ export default function SidebarCollapsed({ onOpenFull }) {
         open={Boolean(profileAnchor)}
         onClose={() => setProfileAnchor(null)}
       >
-        {user?.role !== USERTYPE.ADMIN && (
+        {/* {user?.role !== USERTYPE.ADMIN && (
           <MenuItem
             onClick={() => {
               router.push("/dashboard/myProfile");
@@ -320,7 +341,7 @@ export default function SidebarCollapsed({ onOpenFull }) {
             </ListItemIcon>
             My Profile
           </MenuItem>
-        )}
+        )} */}
 
         <MenuItem>
           <LogoutButton />

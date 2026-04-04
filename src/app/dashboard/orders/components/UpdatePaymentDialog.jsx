@@ -109,7 +109,7 @@ export function UpdatePaymentDialog({ open, onClose, order }) {
         </IconButton>
       </div>
 
-      <DialogContent className="p-5 space-y-6">
+      <DialogContent className="p-5 space-y-4">
         {/* Payable Summary */}
         <div className="bg-[var(--cardsBG)] p-4 border border-dashed border-[var(--border)] text-center rounded-sm">
           <p className="text-[10px] font-bold text-[var(--muted)] uppercase tracking-tighter">Total Payable Amount</p>
@@ -179,7 +179,7 @@ export function UpdatePaymentDialog({ open, onClose, order }) {
                   borderRadius: "4px !important",
                   border: "1px solid var(--border) !important",
                   color: "var(--muted)",
-                  '&.Mui-selected': { bgcolor: "primary.main", color: "white" }
+                  '&.Mui-selected': { bgcolor: "primary.main", color: "black" }
                 }}
               >
                 {m}
@@ -190,11 +190,11 @@ export function UpdatePaymentDialog({ open, onClose, order }) {
 
         {/* Conditional Split Adjustment */}
         {paymentMode === 'mix' && (
-          <div className="space-y-3 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="space-y-3 pt-0 animate-in fade-in slide-in-from-top-2 duration-300">
             <Divider sx={{ borderColor: "var(--border)", borderStyle: "dashed" }}>
               <span className="text-[9px] text-[var(--muted)] bg-[var(--card)] px-2 font-bold uppercase tracking-widest">Adjust Splits</span>
             </Divider>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3 mt-4">
               <TextField
                 label="Cash Amount"
                 fullWidth

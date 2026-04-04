@@ -17,56 +17,40 @@ import { useStaffs } from "@/hooks/useStaffs";
 import { PERMISSIONS } from "@/lib/constants";
 
 const PERMISSION_GROUPS = {
+    Dashboard: [
+        { key: PERMISSIONS.DASHBOARD_VIEW, label: "View" },
+    ],
     Orders: [
         { key: PERMISSIONS.ORDERS_VIEW, label: "View" },
-        { key: PERMISSIONS.ORDERS_CREATE, label: "Create" },
         { key: PERMISSIONS.ORDERS_UPDATE, label: "Update" },
-        { key: PERMISSIONS.ORDERS_DELETE, label: "Delete" },
-        { key: PERMISSIONS.ORDERS_CANCEL, label: "Cancel" },
-    ],
-    Reports: [
-        { key: PERMISSIONS.REPORTS_VIEW, label: "View" },
-        { key: PERMISSIONS.REPORTS_DOWNLOAD, label: "Download" },
-    ],
-    WhatsApp: [
-        { key: PERMISSIONS.WHATSAPP_VIEW, label: "View" },
-        { key: PERMISSIONS.WHATSAPP_SEND, label: "Send" },
-        { key: PERMISSIONS.WHATSAPP_MANAGE_TEMPLATES, label: "Templates" },
     ],
     Products: [
         { key: PERMISSIONS.PRODUCTS_VIEW, label: "View" },
         { key: PERMISSIONS.PRODUCTS_CREATE, label: "Create" },
         { key: PERMISSIONS.PRODUCTS_UPDATE, label: "Update" },
-        { key: PERMISSIONS.PRODUCTS_DELETE, label: "Delete" },
     ],
     Categories: [
         { key: PERMISSIONS.CATEGORIES_VIEW, label: "View" },
         { key: PERMISSIONS.CATEGORIES_CREATE, label: "Create" },
         { key: PERMISSIONS.CATEGORIES_UPDATE, label: "Update" },
-        { key: PERMISSIONS.CATEGORIES_DELETE, label: "Delete" },
     ],
     Customers: [
         { key: PERMISSIONS.CUSTOMERS_VIEW, label: "View" },
         { key: PERMISSIONS.CUSTOMERS_CREATE, label: "Create" },
         { key: PERMISSIONS.CUSTOMERS_UPDATE, label: "Update" },
-        { key: PERMISSIONS.CUSTOMERS_DELETE, label: "Delete" },
     ],
     Billing: [
         { key: PERMISSIONS.BILLING_VIEW, label: "View" },
         { key: PERMISSIONS.BILLING_CREATE, label: "Create" },
-        { key: PERMISSIONS.BILLING_UPDATE, label: "Update" },
-        { key: PERMISSIONS.BILLING_DELETE, label: "Delete" },
-        { key: PERMISSIONS.BILLING_DOWNLOAD, label: "Download" },
     ],
     Staff: [
         { key: PERMISSIONS.STAFF_VIEW, label: "View" },
         { key: PERMISSIONS.STAFF_CREATE, label: "Create" },
         { key: PERMISSIONS.STAFF_UPDATE, label: "Update" },
-        { key: PERMISSIONS.STAFF_DELETE, label: "Delete" },
     ],
-    Settings: [
-        { key: PERMISSIONS.SETTINGS_VIEW, label: "View" },
-        { key: PERMISSIONS.SETTINGS_UPDATE, label: "Update" },
+    Kitchen: [
+        { key: PERMISSIONS.KITCHEN_VIEW, label: "View" },
+        { key: PERMISSIONS.KITCHEN_UPDATE, label: "Update" },
     ],
 };
 

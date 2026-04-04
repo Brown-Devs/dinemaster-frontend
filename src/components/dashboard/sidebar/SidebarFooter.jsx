@@ -13,6 +13,7 @@ import { MoreVert, Person as PersonIcon } from "@mui/icons-material";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import WbSunnyIcon from "@mui/icons-material/WbSunny";
 import { USERTYPE } from "@/lib/constants";
+import LogoutButton from "@/components/auth/LogoutButton";
 // import LogoutButton from "@/components/auth/LogoutButton";
 // import { useLeadStatusStore } from "@/stores/useLeadStatusStore";
 // import { getUserRoleLabel } from "@/utils/roleConfigParser";
@@ -78,7 +79,7 @@ export default function SidebarFooter({ user, mode, setMode, router, variant, on
                 anchorOrigin={{ vertical: "top", horizontal: "right" }}
                 transformOrigin={{ vertical: "top", horizontal: "right" }}
             >
-                {user?.role !== USERTYPE.ADMIN && (
+                {/* {user?.role !== USERTYPE.ADMIN && (
                     <MenuItem
                         onClick={() => {
                             handleMenuClose();
@@ -88,10 +89,10 @@ export default function SidebarFooter({ user, mode, setMode, router, variant, on
                     >
                         <PersonIcon sx={{ mr: 1 }} fontSize="small" /> My Profile
                     </MenuItem>
-                )}
+                )} */}
 
                 <MenuItem>
-                    {/* <LogoutButton /> */}
+                    <LogoutButton />
                 </MenuItem>
             </Menu>
         </Box>
