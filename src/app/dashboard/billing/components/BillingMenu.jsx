@@ -10,8 +10,6 @@ import { useCartStore } from "@/stores/useCartStore";
 
 export default function BillingMenu({ categories, products, loadingCategories, loadingProducts }) {
   const { addToCart } = useCartStore();
-  console.log(categories)
-  console.log(products)
   const [selectedCategoryId, setSelectedCategoryId] = useState("all");
   const [categorySearch, setCategorySearch] = useState("");
   const [productSearch, setProductSearch] = useState("");

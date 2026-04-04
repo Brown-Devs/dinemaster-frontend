@@ -9,7 +9,7 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useCartStore } from "@/stores/useCartStore";
 
-export default function CartSidebar({ onConfirm }) {
+export default function CartSidebar({ onConfirm, confirmText = "Confirm Order", hideConfirm = false }) {
   const { cart, updateQuantity, removeFromCart, discountAmount, setDiscount } = useCartStore();
 
   const subtotal = cart.reduce((sum, item) => sum + (item.pricePerItem * item.quantity), 0);
@@ -39,7 +39,7 @@ export default function CartSidebar({ onConfirm }) {
         </Typography>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar">
         {cart.map((item) => (
           <div key={item.cartId} className="flex gap-2 bg-cardsBG p-2 rounded-xl border border-border">
             <div className="w-12 h-12 shrink-0 rounded-lg overflow-hidden bg-white border border-border2">
@@ -127,16 +127,18 @@ export default function CartSidebar({ onConfirm }) {
           <Typography variant="h5" fontWeight="900" sx={{ color: "var(--fg)" }}>₹{total}</Typography>
         </div>
 
-        <Button 
-          variant="contained" 
-          fullWidth 
-          color="error"
-          size="large"
-          onClick={onConfirm}
-          sx={{ py: 1.5, borderRadius: 2, fontWeight: 'bold', fontSize: 16, textTransform: 'none' }}
-        >
-          Confirm Order
-        </Button>
+        {!hideConfirm && (
+          <Button 
+            variant="contained" 
+            fullWidth 
+            color="error"
+            size="large"
+            onClick={onConfirm}
+            sx={{ py: 1.5, borderRadius: 2, fontWeight: 'bold', fontSize: 16, textTransform: 'none' }}
+          >
+            {confirmText}
+          </Button>
+        )}
       </div>
     </div>
   );
