@@ -1,171 +1,181 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  Button, 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
+import {
+  Button,
+  Dialog,
+  DialogContent,
   DialogActions,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
-import { 
-  Timer,
-  ShoppingBag,
-  User as UserIcon,
-  Phone as PhoneIcon
-} from "lucide-react";
-import { format } from "date-fns";
+import { Timer } from "lucide-react";
+import { useOrders } from "@/hooks/admin/useOrders";
 
-export default function OrderCard({ order, onUpdateStatus, isUpdating, onClick }) {
+// Shared card content used in both the card and the dialog
+function OrderCardContent({ order, timeAgo, getItemLabel }) {
+  const items = order.items || [];
+
+  return (
+    <div>
+      {/* Header */}
+      <div className="flex justify-between items-center mb-3">
+        <div className="flex items-center gap-2">
+          <span className="text-base font-black text-foreground tracking-tighter">
+            #{order.orderId || order._id?.slice(-4)}
+          </span>
+          <span className="text-[10px] font-bold text-muted flex items-center gap-0.5">
+            <Timer size={9} strokeWidth={3} />
+            {timeAgo(order.createdAt)}
+          </span>
+        </div>
+        <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${order.orderType === "dinein"
+          ? "bg-amber-50 text-amber-700 border-amber-200"
+          : order.orderType === "delivery"
+            ? "bg-blue-50 text-blue-700 border-blue-200"
+            : "bg-emerald-50 text-emerald-700 border-emerald-200"
+          }`}>
+          {order.orderType === "homeDelivery" ? "Delivery" : order.orderType}
+        </span>
+      </div>
+
+      {/* All Products in one box */}
+      <div className="border border-border rounded-md bg-foreground/[0.015] mb-3">
+        {items.map((item, i) => (
+          <div
+            key={i}
+            className={`px-3 py-2 ${i !== items.length - 1 ? "border-b border-border" : ""}`}
+          >
+            <div className="flex items-start gap-2">
+              <span className="text-[11px] font-black text-foreground/60 min-w-[18px]">
+                {item.quantity}×
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-foreground tracking-tight leading-snug">
+                  {getItemLabel(item)}
+                </p>
+                {item.addOns?.length > 0 && (
+                  <p className="text-[10px] text-muted font-medium mt-0.5 leading-tight">
+                    {item.addOns.map((a) => `+ ${a.name}`).join(", ")}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Customer */}
+      <div className="flex items-center justify-between px-1">
+        <p className="text-[11px] font-bold text-foreground tracking-tight">
+          {order.customer?.name || "Guest"}
+        </p>
+        <p className="text-[10px] text-muted font-medium">
+          {order.customer?.mobileNo}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export default function OrderCard({ order, showPrepareAction = true, onStatusUpdated }) {
   const [confirmOpen, setConfirmOpen] = useState(false);
-
-  const handlePrepareClick = (e) => {
-    e.stopPropagation();
-    setConfirmOpen(true);
-  };
-
-  const handleConfirmPrepared = () => {
-    onUpdateStatus(order._id, 'prepared');
-    setConfirmOpen(false);
-  };
+  const { updateOrderMutation } = useOrders();
 
   const timeAgo = (date) => {
     const mins = Math.floor((new Date() - new Date(date)) / 60000);
     if (mins < 1) return "Just now";
-    if (mins < 60) return `${mins}m ago`;
-    return `${Math.floor(mins/60)}h ago`;
+    if (mins < 60) return `${mins}m`;
+    return `${Math.floor(mins / 60)}h`;
   };
 
-  const items = order.items || [];
-  const displayItems = items.slice(0, 5);
-  const remainingCount = items.length - 5;
+  const getItemLabel = (item) => {
+    const name = item.name || item.productId?.name || "Item";
+    const variant = item.variant?.name;
+    return variant ? `${name} (${variant})` : name;
+  };
+
+  const handleConfirmPrepared = () => {
+    updateOrderMutation.mutateAsync({
+      id: order._id,
+      data: { status: "prepared" },
+    }).then(() => {
+      setConfirmOpen(false);
+      onStatusUpdated?.();
+    });
+  };
 
   return (
     <>
-      <div 
-        onClick={onClick}
-        className="bg-card border border-border rounded-md p-4 transition-all cursor-pointer shadow-none active:bg-foreground/5"
-      >
-        {/* Header: ID and Type */}
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <h3 className="text-xl font-black text-foreground tracking-tighter leading-none">
-              #{order.orderId || order._id.slice(-6).toUpperCase()}
-            </h3>
-            <div className="flex items-center gap-1 text-[10px] font-bold text-muted uppercase tracking-wider mt-1">
-               <Timer size={10} strokeWidth={3} />
-               {timeAgo(order.createdAt)}
-            </div>
-          </div>
-          <div className="bg-foreground/5 border border-border px-2 py-0.5 rounded-md text-[10px] font-black uppercase text-foreground">
-            {order.orderType === 'homeDelivery' ? 'Delivery' : order.orderType}
-          </div>
-        </div>
+      <div className="bg-card border border-border rounded-md p-3">
+        <OrderCardContent order={order} timeAgo={timeAgo} getItemLabel={getItemLabel} />
 
-        {/* Products Section (FIRST) */}
-        <div className="space-y-1.5 mb-4">
-          <div className="flex items-center gap-1.5 mb-2 pl-1">
-            <ShoppingBag size={12} className="text-muted" />
-            <span className="text-[10px] font-black uppercase text-muted tracking-widest">Items ({items.length})</span>
-          </div>
-          
-          {displayItems.map((item, i) => (
-            <div key={i} className="border border-border p-2 rounded-md bg-foreground/2">
-              <div className="flex justify-between items-start gap-2">
-                <span className="text-xs font-black text-foreground tracking-tight leading-snug">
-                  {item.quantity} × {item.name}
-                </span>
-              </div>
-              {item.variant?.name && (
-                <p className="text-[10px] font-bold text-muted mt-0.5 uppercase tracking-tighter">
-                  {item.variant.name}
-                </p>
-              )}
-              {item.addOns?.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-1.5 pt-1.5 border-t border-border/50">
-                  {item.addOns.map((add, aIdx) => (
-                    <span 
-                      key={aIdx} 
-                      className="text-[9px] font-bold text-muted leading-none bg-foreground/5 px-1.5 py-0.5 rounded"
-                    >
-                      + {add.name}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-
-          {remainingCount > 0 && (
-            <div className="text-center py-1 bg-foreground/5 rounded-md border border-dashed border-border mt-2">
-              <span className="text-[10px] font-black text-muted uppercase tracking-widest">
-                + {remainingCount} more items...
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* User Details (SECOND) */}
-        <div className="pt-3 border-t border-border mt-3 space-y-0.5 pl-1">
-          <p className="text-xs font-black text-foreground tracking-tight uppercase leading-none">
-            {order.customer?.name || "Guest Visitor"}
-          </p>
-          <p className="text-[11px] font-bold text-muted tracking-tighter">
-            {order.customer?.mobileNo}
-          </p>
-        </div>
-
-        {/* Action: Mark Prepared */}
-        <button
-          onClick={handlePrepareClick}
-          disabled={isUpdating}
-          className="w-full mt-5 py-2.5 bg-foreground text-background font-black rounded-md uppercase tracking-tighter text-xs transition-opacity active:opacity-80 disabled:opacity-50"
-        >
-          {isUpdating ? "Updating..." : "Mark Prepared"}
-        </button>
+        {/* Action */}
+        {showPrepareAction && (
+          <button
+            onClick={() => setConfirmOpen(true)}
+            className="w-full mt-3 py-2 bg-foreground text-background font-bold rounded-md text-xs tracking-tight transition-opacity active:opacity-80"
+          >
+            Mark Prepared
+          </button>
+        )}
       </div>
 
-      {/* Confirmation Dialog */}
+      {/* Confirm Dialog - shows order card + confirm button */}
       <Dialog
         open={confirmOpen}
-        onClose={() => setConfirmOpen(false)}
+        onClose={() => !updateOrderMutation.isPending && setConfirmOpen(false)}
         maxWidth="xs"
         fullWidth
         PaperProps={{
-          sx: { 
-            borderRadius: '8px', 
-            bgcolor: 'var(--card)', 
-            border: '1px solid var(--border)', 
-            backgroundImage: 'none',
-            margin: '16px'
-          }
+          sx: {
+            borderRadius: "8px",
+            bgcolor: "var(--card)",
+            border: "1px solid var(--border)",
+            backgroundImage: "none",
+            boxShadow: "none",
+            margin: "12px",
+          },
         }}
       >
-        <DialogTitle className="px-6 pt-5 pb-2 text-lg font-black tracking-tighter uppercase">
-          Confirm Preparation
-        </DialogTitle>
-        <DialogContent className="px-6 pb-6 pt-2">
-          <p className="text-sm font-bold text-muted tracking-tight leading-relaxed">
-            Are you sure this order is prepared and ready for table/delivery?
-          </p>
+        <DialogContent className="p-4">
+          {/* Same order card content inside the dialog */}
+          <OrderCardContent order={order} timeAgo={timeAgo} getItemLabel={getItemLabel} />
         </DialogContent>
-        <DialogActions className="px-5 pb-5 pt-0 gap-2">
-          <Button 
-            onClick={() => setConfirmOpen(false)} 
-            className="text-xs font-black tracking-tighter uppercase text-muted hover:bg-foreground/5 px-4"
-            sx={{ borderRadius: '4px' }}
+
+        <DialogActions className="px-4 pb-4 pt-0 gap-1">
+          <Button
+            onClick={() => setConfirmOpen(false)}
+            disabled={updateOrderMutation.isPending}
+            size="small"
+            sx={{
+              borderRadius: "6px",
+              textTransform: "none",
+              fontSize: "12px",
+              fontWeight: 700,
+              color: "var(--muted)",
+              px: 2,
+            }}
           >
             Cancel
           </Button>
-          <LoadingButton 
-            onClick={handleConfirmPrepared} 
-            loading={isUpdating}
+          <LoadingButton
+            onClick={handleConfirmPrepared}
+            loading={updateOrderMutation.isPending}
             variant="contained"
-            className="bg-foreground text-background font-black text-xs tracking-tighter uppercase px-6 h-9 shadow-none hover:shadow-none hover:bg-foreground active:bg-foreground"
-            sx={{ 
-                borderRadius: '4px',
-                '& .MuiLoadingButton-loadingIndicator': { color: 'var(--card)' }
+            size="small"
+            sx={{
+              borderRadius: "6px",
+              textTransform: "none",
+              fontSize: "12px",
+              fontWeight: 700,
+              bgcolor: "var(--fg)",
+              color: "var(--card)",
+              boxShadow: "none",
+              px: 2,
+              "&:hover": { bgcolor: "var(--fg)", boxShadow: "none" },
+              "& .MuiLoadingButton-loadingIndicator": {
+                color: "var(--card)",
+              },
             }}
           >
             Yes, Prepared

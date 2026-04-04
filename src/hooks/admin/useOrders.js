@@ -1,5 +1,5 @@
 import api from "@/lib/services/axios";
-import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 export const useOrders = () => {
@@ -52,9 +52,34 @@ export const useOrders = () => {
         }
     });
 
+    // 4. Fetch Kitchen Orders (Infinite scroll with counts)
+    const kitchenOrdersQuery = (params = {}) => {
+        const { page, ...restParams } = params;
+        const filteredParams = Object.fromEntries(
+            Object.entries(restParams).filter(([_, v]) => v != null && v !== "")
+        );
+
+        return useInfiniteQuery({
+            queryKey: ["kitchen-orders", filteredParams],
+            queryFn: async ({ pageParam = 1 }) => {
+                const response = await api.get(`/orders/kitchen`, {
+                    params: { ...filteredParams, page: pageParam },
+                });
+                return response.data;
+            },
+            initialPageParam: 1,
+            getNextPageParam: (lastPage) => {
+                const pagination = lastPage?.data?.pagination;
+                return pagination?.hasNextPage ? pagination.page + 1 : undefined;
+            },
+            staleTime: 1000 * 30,
+        });
+    };
+
     return {
         createOrderMutation,
         ordersQuery,
+        kitchenOrdersQuery,
         updateOrderMutation
     };
 };
