@@ -19,6 +19,15 @@ export const useBrandProducts = () => {
         });
     }
 
+    // 1b. Fetch All Brand Products for POS (Limit 500)
+    const allBrandProductsQuery = (params = {}) => {
+        return useQuery({
+            queryKey: ['allBrandProducts', params],
+            queryFn: () => api.get(`/brand-products`, { params: { limit: 500, active: true, ...params } }),
+            staleTime: 1000 * 60 * 30, // 30 mins
+        });
+    }
+
     // 2. Fetch Master Products NOT yet imported
     const notImportedProductsQuery = (params = {}) => {
         const filteredParams = Object.fromEntries(
@@ -114,6 +123,7 @@ export const useBrandProducts = () => {
 
     return {
         brandProductsQuery,
+        allBrandProductsQuery,
         notImportedProductsQuery,
         masterCategoriesQuery,
         companyCategoriesQuery,
