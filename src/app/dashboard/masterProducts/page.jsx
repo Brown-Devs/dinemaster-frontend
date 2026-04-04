@@ -37,7 +37,11 @@ export default function MasterProductsPage() {
   const [editingProduct, setEditingProduct] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
 
-  const { masterProductsQuery, masterCategoriesQuery } = useMasterProducts();
+  const { 
+    masterProductsQuery, 
+    masterCategoriesQuery, 
+    deleteMasterProductMutation 
+  } = useMasterProducts();
   const { data: catData } = masterCategoriesQuery();
   const categories = catData?.data || [];
 
@@ -103,9 +107,8 @@ export default function MasterProductsPage() {
   };
 
   const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this master product?")) {
-      // Logic for deletion if implemented in hook, or just a placeholder for now
-      toast.error("Delete functionality not yet fully linked to backend mutation");
+    if (window.confirm("Are you sure you want to delete this master product? This will also un-link any brand products derived from it.")) {
+      deleteMasterProductMutation.mutate(id);
     }
   };
 

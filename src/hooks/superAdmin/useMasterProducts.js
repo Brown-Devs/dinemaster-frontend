@@ -54,10 +54,23 @@ export const useMasterProducts = () => {
         }
     });
 
+    const deleteMasterProductMutation = useMutation({
+        mutationFn: (id) => api.delete(`/master-catalogs/${id}`),
+        onSuccess: () => {
+            queryClient.invalidateQueries(['masterProducts']);
+            queryClient.invalidateQueries(['masterCategories']);
+            toast.success('Master product deleted successfully');
+        },
+        onError: (err) => {
+            toast.error(err?.response?.data?.message || 'Failed to delete master product');
+        }
+    });
+
     return {
         masterProductsQuery,
         masterCategoriesQuery,
         createMasterProductMutation,
-        updateMasterProductMutation
+        updateMasterProductMutation,
+        deleteMasterProductMutation
     }
 }
