@@ -12,7 +12,8 @@ import {
   Wallet,
   CheckCircle2,
   Clock,
-  ChevronRight
+  ChevronRight,
+  CalendarDays
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { formatDate_DD_MMM_YYYY } from '@/lib/services/dateFormat';
@@ -27,6 +28,8 @@ export default function DashboardSummary() {
     from: new Date(),
     to: new Date()
   });
+  const [openFrom, setOpenFrom] = useState(false);
+  const [openTo, setOpenTo] = useState(false);
 
   const formatParam = (date) => date ? format(date, 'yyyy-MM-dd') : undefined;
 
@@ -102,71 +105,76 @@ export default function DashboardSummary() {
   return (
     <div className="bg-card rounded-2xl border border-border overflow-hidden">
       {/* Container Header */}
-      <div className="flex items-center justify-between p-5 border-b border-border bg-card">
-        <div className="flex flex-col md:flex-row md:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-start sm:justify-between items-start sm:items-center gap-4 p-4 md:p-5 border-b border-border bg-card">
+        {/* Title Row */}
+        <div className="flex flex-col gap-1.5">
           <div className="flex items-center gap-3">
             <div className="w-1.5 h-6 bg-blue-600 rounded-full" />
-            <h3 className="text-xl font-extrabold tracking-tighter text-foreground">Quick Summary</h3>
-          </div>
-          <div className="flex items-center gap-2 px-3 py-1 bg-card2 rounded-full border border-border">
-            <span className="text-[10px] font-black text-muted tracking-tight">Period:</span>
-            <span className="text-[11px] font-bold text-foreground">
-              {formatDate_DD_MMM_YYYY(dateRange.from)} <span className="text-muted ml-2 mr-2">→</span> {formatDate_DD_MMM_YYYY(dateRange.to)}
-            </span>
+            <h3 className="text-lg md:text-xl font-extrabold tracking-tighter text-foreground">Quick Summary</h3>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <div className="flex items-center gap-2 bg-card2 p-1.5 rounded-xl border border-border">
-              <DatePicker
-                label="From"
-                format="dd/MM/yyyy"
-                value={dateRange.from}
-                onChange={(val) => setDateRange(prev => ({ ...prev, from: val }))}
-                slotProps={{
-                  textField: {
-                    size: 'small',
-                    variant: 'standard',
-                    sx: {
-                      width: 150,
-                      '& .MuiInput-root': { color: 'var(--fg)', '&:before': { borderBottom: 'none' }, '&:after': { borderBottom: 'none' } },
-                      '& .MuiInputLabel-root': { color: 'var(--muted)', fontSize: '0.75rem' }
-                    }
-                  }
-                }}
-              />
-              <div className="w-px h-6 bg-border mx-1" />
-              <DatePicker
-                label="To"
-                format="dd/MM/yyyy"
-                value={dateRange.to}
-                onChange={(val) => setDateRange(prev => ({ ...prev, to: val }))}
-                slotProps={{
-                  textField: {
-                    size: 'small',
-                    variant: 'standard',
-                    sx: {
-                      width: 150,
-                      '& .MuiInput-root': { color: 'var(--fg)', '&:before': { borderBottom: 'none' }, '&:after': { borderBottom: 'none' } },
-                      '& .MuiInputLabel-root': { color: 'var(--muted)', fontSize: '0.75rem' }
-                    }
-                  }
-                }}
-              />
+        {/* Date Pickers Row */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center bg-card2 p-1 rounded-lg border border-border">
+            <div className="relative flex">
+              <button
+                onClick={() => setOpenFrom(true)}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md hover:bg-card transition-colors active:scale-95"
+              >
+                <CalendarDays size={14} className="text-muted" />
+                <div className="flex flex-col items-start leading-[1.1]">
+                  <span className="text-[8px] text-muted font-bold uppercase tracking-widest">From</span>
+                  <span className="text-[11px] font-extrabold text-foreground tracking-tight">{format(dateRange.from, 'dd/MM/yyyy')}</span>
+                </div>
+              </button>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DatePicker
+                  open={openFrom}
+                  onClose={() => setOpenFrom(false)}
+                  value={dateRange.from}
+                  onChange={(val) => { if (val) { setDateRange(prev => ({ ...prev, from: val })); setOpenFrom(false); } }}
+                  slotProps={{ textField: { sx: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, padding: 0, pointerEvents: 'none' } } }}
+                />
+              </LocalizationProvider>
             </div>
-          </LocalizationProvider>
+
+            <div className="w-px h-6 bg-border mx-1" />
+
+            <div className="relative flex">
+              <button
+                onClick={() => setOpenTo(true)}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md hover:bg-card transition-colors active:scale-95"
+              >
+                <CalendarDays size={14} className="text-muted" />
+                <div className="flex flex-col items-start leading-[1.1]">
+                  <span className="text-[8px] text-muted font-bold uppercase tracking-widest">To</span>
+                  <span className="text-[11px] font-extrabold text-foreground tracking-tight">{format(dateRange.to, 'dd/MM/yyyy')}</span>
+                </div>
+              </button>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DatePicker
+                  open={openTo}
+                  onClose={() => setOpenTo(false)}
+                  value={dateRange.to}
+                  onChange={(val) => { if (val) { setDateRange(prev => ({ ...prev, to: val })); setOpenTo(false); } }}
+                  slotProps={{ textField: { sx: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, padding: 0, pointerEvents: 'none' } } }}
+                />
+              </LocalizationProvider>
+            </div>
+          </div>
           <Button
             variant="contained"
             size="small"
-            startIcon={<RefreshIcon />}
+            startIcon={<RefreshIcon sx={{ fontSize: '16px !important' }} />}
             onClick={() => setDateRange({ from: new Date(), to: new Date() })}
             sx={{
-              borderRadius: '12px',
+              borderRadius: '6px',
               textTransform: 'none',
               fontWeight: 'bold',
-              px: 3,
-              py: 1,
+              fontSize: '12px',
+              px: 2,
+              py: 0.8,
               bgcolor: 'var(--card)',
               color: 'var(--fg)',
               boxShadow: 'none',

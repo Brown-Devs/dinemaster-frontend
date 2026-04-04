@@ -30,26 +30,24 @@ export default function CompanyDashboardPage() {
   return (
     <InnerDashboardLayout>
       {/* Header */}
-      <div className="flex justify-between items-center mb-4 gap-6">
-        <div className="space-y-1 mt-3">
-          <h2 className="text-4xl font-bold tracking-tight">
-            Dashboard
+      <div className="flex justify-between items-center mb-4 gap-4 mt-3 px-1">
+        <div className="space-y-0.5">
+          <h2 className="text-2xl md:text-3xl font-black tracking-tighter text-foreground">
+            Coffee Zone Dashboard
           </h2>
-          <p className="text-gray-500 font-medium flex items-center gap-2">
-            Welcome back. Here's what's happening today.
+          <p className="text-xs md:text-sm text-muted font-medium">
+            Welcome back, {user?.name}
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Tooltip title="Refresh everything">
-            <button
-              onClick={() => refetchAll()}
-              className="p-3 bg-white hover:bg-gray-50 border border-gray-200 rounded-2xl shadow-sm transition-all hover:scale-105 active:scale-95 group"
-            >
-              <RefreshCw size={22} className="text-gray-600 group-hover:text-blue-600 transition-colors" />
-            </button>
-          </Tooltip>
-        </div>
+        <Tooltip title="Refresh everything">
+          <button
+            onClick={() => refetchAll()}
+            className="p-2.5 bg-card border border-border rounded-md transition-all active:opacity-80"
+          >
+            <RefreshCw size={18} className="text-foreground" />
+          </button>
+        </Tooltip>
       </div>
 
       <div className="space-y-5">
@@ -60,9 +58,9 @@ export default function CompanyDashboardPage() {
 
         {/* Visual Trends & Growth */}
         <section>
-          <div className="flex items-center gap-3 mb-4">
-            <h3 className="text-2xl font-bold text-gray-800">Growth & Trends</h3>
-            <div className="h-[2px] flex-1 bg-linear-to-r from-gray-200 to-transparent" />
+          <div className="flex items-center gap-3 mb-4 px-1">
+            <h3 className="text-lg md:text-xl font-black tracking-tighter text-foreground">Growth & Trends</h3>
+            <div className="h-px flex-1 bg-border" />
           </div>
           <DashboardCharts />
         </section>

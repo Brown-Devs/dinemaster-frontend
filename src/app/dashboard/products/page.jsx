@@ -142,10 +142,12 @@ export default function ProductsPage() {
 
   return (
     <InnerDashboardLayout>
-      <div className="flex justify-between items-center mb-6 mt-2 flex-wrap gap-4">
+      <div className="flex justify-between items-center mb-6 mt-2 flex-wrap gap-4 px-1">
         <div>
-          <h1 className="font-bold text-3xl tracking-tight">Products</h1>
-          <p style={{ color: "var(--muted)" }}>
+          <h1 className="text-2xl font-black tracking-tighter text-foreground">
+            Products
+          </h1>
+          <p className="text-[13px] text-muted mt-0.5">
             Manage your company products, add new ones or import from master catalog.
           </p>
         </div>
@@ -209,7 +211,7 @@ export default function ProductsPage() {
                   Delete ({selectedIds.length})
                 </Button>
               )}
-              
+
               <Tooltip title="Refresh">
                 <IconButton onClick={() => brandProductsData.refetch()} disabled={brandProductsData.isFetching}>
                   <RefreshIcon fontSize="small" className={brandProductsData.isFetching ? "animate-spin" : ""} />

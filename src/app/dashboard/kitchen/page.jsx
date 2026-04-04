@@ -6,6 +6,8 @@ import { useOrders } from "@/hooks/admin/useOrders";
 import { IconButton, Tooltip, CircularProgress } from "@mui/material";
 import { RefreshCw, UtensilsCrossed, CalendarDays } from "lucide-react";
 import { format } from "date-fns";
+import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import OrderCard from "./components/OrderCard";
 
 export default function KitchenPage() {
@@ -13,8 +15,8 @@ export default function KitchenPage() {
 
   const [statusTab, setStatusTab] = useState("new");
   const [typeFilter, setTypeFilter] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(format(new Date(), "yyyy-MM-dd"));
-  const dateInputRef = useRef(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
   const {
     data,
@@ -27,7 +29,7 @@ export default function KitchenPage() {
   } = kitchenOrdersQuery({
     status: statusTab,
     orderType: typeFilter,
-    date: selectedDate,
+    date: format(selectedDate, "yyyy-MM-dd"),
     limit: 10,
   });
 
@@ -37,7 +39,7 @@ export default function KitchenPage() {
 
   // Auto-refresh every 30 seconds
   useEffect(() => {
-    const interval = setInterval(() => refetch(), 30000);
+    const interval = setInterval(() => refetch(), 10000);
     return () => clearInterval(interval);
   }, [refetch]);
 
@@ -61,10 +63,10 @@ export default function KitchenPage() {
 
 
   // Display date label
-  const isToday = selectedDate === format(new Date(), "yyyy-MM-dd");
-  const dateLabel = isToday
-    ? "Today"
-    : format(new Date(selectedDate + "T00:00:00"), "dd MMM yyyy");
+  const todayStr = format(new Date(), "yyyy-MM-dd");
+  const selectedStr = format(selectedDate, "yyyy-MM-dd");
+  const isToday = selectedStr === todayStr;
+  const dateLabel = isToday ? "Today" : format(selectedDate, "dd MMM yyyy");
 
   const chipStyles = {
     dinein: {
@@ -96,27 +98,30 @@ export default function KitchenPage() {
   return (
     <InnerDashboardLayout>
       {/* Header */}
-      <div className="flex items-center justify-between mb-5 mt-1 px-1">
+      <div className="flex items-center justify-between mb-5 mt-3 px-1">
         <div>
           <h1 className="text-2xl font-black tracking-tighter text-foreground">
             Kitchen Display
           </h1>
           <p className="text-[10px] text-muted font-bold uppercase tracking-widest mt-0.5">
-            {dateLabel} · Auto-refresh 30s
+            {dateLabel}
           </p>
         </div>
         <div className="flex items-center gap-1.5">
-          {/* Hidden native date input */}
-          <input
-            ref={dateInputRef}
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="sr-only"
-          />
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <DatePicker
+              value={selectedDate}
+              onChange={(val) => { if (val) { setSelectedDate(val); setCalendarOpen(false); } }}
+              open={calendarOpen}
+              onClose={() => setCalendarOpen(false)}
+              slotProps={{
+                textField: { sx: { display: "none" } },
+              }}
+            />
+          </LocalizationProvider>
           <Tooltip title="Select Date">
             <IconButton
-              onClick={() => dateInputRef.current?.showPicker()}
+              onClick={() => setCalendarOpen(true)}
               className="rounded-md border border-border bg-card"
               sx={{ p: 1 }}
             >
@@ -161,14 +166,12 @@ export default function KitchenPage() {
             <button
               key={chip.value}
               onClick={() => setTypeFilter(isActive ? null : chip.value)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-[11px] font-bold tracking-tight whitespace-nowrap transition-colors ${
-                isActive ? style.active : style.inactive
-              }`}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-[11px] font-bold tracking-tight whitespace-nowrap transition-colors ${isActive ? style.active : style.inactive
+                }`}
             >
               {chip.label}
-              <span className={`text-[10px] font-black px-1.5 py-0.5 rounded ${
-                isActive ? style.badge : style.badgeInactive
-              }`}>
+              <span className={`text-[10px] font-black px-1.5 py-0.5 rounded ${isActive ? style.badge : style.badgeInactive
+                }`}>
                 {chip.count}
               </span>
             </button>
