@@ -10,9 +10,12 @@ import { Switch } from "@mui/material";
 import TableSkeleton2 from "@/components/shared/TableSkeleton2";
 import { formatDateWithTime, formatRelativeTime } from "@/lib/services/dateFormat";
 import { useStaffs } from "@/hooks/useStaffs";
+import { usePermissions } from "@/hooks/usePermissions";
+import { PERMISSIONS } from "@/lib/constants";
 
 export default function SubAdminsTable({ apiData, onPageChange, limit, setLimit, dataLoading, onEdit }) {
     const { updateStaff } = useStaffs();
+    const { checkPermission } = usePermissions();
 
     const handleToggleStatus = async (user) => {
         try {
@@ -64,27 +67,33 @@ export default function SubAdminsTable({ apiData, onPageChange, limit, setLimit,
                                     </TableCell>
 
                                     <TableCell>
-                                        <Tooltip title={u?.active ? "Deactivate" : "Activate"} arrow>
-                                            <Switch
-                                                checked={!!u?.active}
-                                                onChange={() => handleToggleStatus(u)}
-                                                disabled={updateStaff.isPending}
-                                                size="small"
-                                                color="success"
-                                            />
-                                        </Tooltip>
+                                        {checkPermission(PERMISSIONS.STAFF_UPDATE) ? (
+                                            <Tooltip title={u?.active ? "Deactivate" : "Activate"} arrow>
+                                                <Switch
+                                                    checked={!!u?.active}
+                                                    onChange={() => handleToggleStatus(u)}
+                                                    disabled={updateStaff.isPending}
+                                                    size="small"
+                                                    color="success"
+                                                />
+                                            </Tooltip>
+                                        ) : (
+                                            <Chip label={u?.active ? "Active" : "Inactive"} size="small" variant="outlined" />
+                                        )}
                                     </TableCell>
 
                                     <TableCell align="right">
-                                        <Tooltip title="Edit" arrow>
-                                            <IconButton
-                                                size="small"
-                                                onClick={() => onEdit && onEdit(u)}
-                                                sx={{ color: "#4f46e5", "&:hover": { backgroundColor: "#eef2ff" } }}
-                                            >
-                                                <EditIcon fontSize="small" />
-                                            </IconButton>
-                                        </Tooltip>
+                                        {checkPermission(PERMISSIONS.STAFF_UPDATE) && (
+                                            <Tooltip title="Edit" arrow>
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => onEdit && onEdit(u)}
+                                                    sx={{ color: "#4f46e5", "&:hover": { backgroundColor: "#eef2ff" } }}
+                                                >
+                                                    <EditIcon fontSize="small" />
+                                                </IconButton>
+                                            </Tooltip>
+                                        )}
                                     </TableCell>
                                 </TableRow>
                             ))}

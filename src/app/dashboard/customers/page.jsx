@@ -14,8 +14,13 @@ import { Search, RefreshCw, Users as UsersIcon } from "lucide-react";
 import { useCustomers } from "@/hooks/admin/useCustomers";
 import { useDebounce } from "@/hooks/useDebounce";
 import CustomersTable from "./components/CustomersTable";
+import { usePermissions } from "@/hooks/usePermissions";
+import { PERMISSIONS, MODULES } from "@/lib/constants";
+import PermissionDenied from "@/components/shared/PermissionDenied";
 
 export default function CustomersPage() {
+  const { isModuleEnabled, checkPermission } = usePermissions();
+
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -62,6 +67,9 @@ export default function CustomersPage() {
     });
     router.replace(`?${params.toString()}`);
   };
+
+  const hasAccess = isModuleEnabled(MODULES.CUSTOMERS) && checkPermission(PERMISSIONS.CUSTOMERS_VIEW);
+  if (!hasAccess) return <PermissionDenied />;
 
   return (
     <InnerDashboardLayout>

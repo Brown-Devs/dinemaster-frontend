@@ -8,8 +8,11 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import TableSkeleton2 from "@/components/shared/TableSkeleton2";
 import { formatDateWithTime, formatRelativeTime } from "@/lib/services/dateFormat";
+import { usePermissions } from "@/hooks/usePermissions";
+import { PERMISSIONS } from "@/lib/constants";
 
 export default function AdminsTable({ apiData, onPageChange, limit, setLimit, dataLoading, onEdit }) {
+    const { checkPermission } = usePermissions();
     return (
         <div>
             <TableContainer>
@@ -61,15 +64,17 @@ export default function AdminsTable({ apiData, onPageChange, limit, setLimit, da
                                     </TableCell>
 
                                     <TableCell align="right">
-                                        <Tooltip title="Edit" arrow>
-                                            <IconButton
-                                                size="small"
-                                                onClick={() => onEdit && onEdit(u)}
-                                                sx={{ color: "#4f46e5", "&:hover": { backgroundColor: "#eef2ff" } }}
-                                            >
-                                                <EditIcon fontSize="small" />
-                                            </IconButton>
-                                        </Tooltip>
+                                        {checkPermission(PERMISSIONS.STAFF_UPDATE) && (
+                                            <Tooltip title="Edit" arrow>
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => onEdit && onEdit(u)}
+                                                    sx={{ color: "#4f46e5", "&:hover": { backgroundColor: "#eef2ff" } }}
+                                                >
+                                                    <EditIcon fontSize="small" />
+                                                </IconButton>
+                                            </Tooltip>
+                                        )}
                                     </TableCell>
                                 </TableRow>
                             ))}

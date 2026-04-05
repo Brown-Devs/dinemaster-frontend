@@ -20,12 +20,14 @@ import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMasterProducts } from "@/hooks/superAdmin/useMasterProducts";
-import MasterProductsTable from "./components/MasterProductsTable";
 import MasterProductFormModal from "./components/MasterProductFormModal";
+import { usePermissions } from "@/hooks/usePermissions";
+import { PERMISSIONS } from "@/lib/constants";
 
 export default function MasterProductsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { checkPermission } = usePermissions();
 
   const page = Number(searchParams.get("page")) || 1;
   const limit = Number(searchParams.get("limit")) || 10;
@@ -39,8 +41,7 @@ export default function MasterProductsPage() {
 
   const { 
     masterProductsQuery, 
-    masterCategoriesQuery, 
-    deleteMasterProductMutation 
+    masterCategoriesQuery 
   } = useMasterProducts();
   const { data: catData } = masterCategoriesQuery();
   const categories = catData?.data || [];
@@ -106,12 +107,6 @@ export default function MasterProductsPage() {
     setEditingProduct(null);
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this master product? This will also un-link any brand products derived from it.")) {
-      deleteMasterProductMutation.mutate(id);
-    }
-  };
-
   return (
     <InnerDashboardLayout>
       {/* Header */}
@@ -141,17 +136,19 @@ export default function MasterProductsPage() {
             </span>
           </Tooltip>
 
-          <Tooltip title="Create New Product" arrow>
-            <span>
-              <Button
-                variant="outlined"
-                startIcon={<AddIcon />}
-                onClick={handleOpenAdd}
-              >
-                Add New
-              </Button>
-            </span>
-          </Tooltip>
+          {checkPermission(PERMISSIONS.MASTER_CATALOG_CREATE) && (
+            <Tooltip title="Create New Product" arrow>
+              <span>
+                <Button
+                  variant="outlined"
+                  startIcon={<AddIcon />}
+                  onClick={handleOpenAdd}
+                >
+                  Add New
+                </Button>
+              </span>
+            </Tooltip>
+          )}
         </div>
       </div>
 
@@ -226,7 +223,6 @@ export default function MasterProductsPage() {
           setLimit={(val) => updateParams({ limit: val, page: 1 })}
           onPageChange={(p) => updateParams({ page: p })}
           onEdit={handleOpenEdit}
-          onDelete={handleDelete}
           selectedIds={selectedIds}
           onSelectChange={setSelectedIds}
         />

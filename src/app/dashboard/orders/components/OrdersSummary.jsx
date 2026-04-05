@@ -18,12 +18,15 @@ import {
   IndianRupee 
 } from 'lucide-react';
 import { useOrders } from '@/hooks/admin/useOrders';
+import { usePermissions } from '@/hooks/usePermissions';
+import { PERMISSIONS } from '@/lib/constants';
 
 export default function OrdersSummary({ isExpanded }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
   const { statsQuery } = useOrders();
+  const { checkPermission } = usePermissions();
   const { data, isLoading } = statsQuery({
     enabled: isExpanded
   });
@@ -145,12 +148,21 @@ export default function OrdersSummary({ isExpanded }) {
             <Grid item xs={12} md={4}>
               <GradientStatCard 
                 title="Paid Revenue" 
-                value={`₹${stats.paymentBreakdown?.paid?.totalAmount?.toLocaleString() || 0}`} 
+                value={checkPermission(PERMISSIONS.BILLING_VIEW) 
+                  ? `₹${stats.paymentBreakdown?.paid?.totalAmount?.toLocaleString() || 0}`
+                  : "₹ ****"
+                } 
                 Icon={IndianRupee} 
                 bgGradient="bg-linear-to-r from-[#2563eb] to-[#1e40af]"
               >
-                <SubMetric label="Cash" value={`₹${stats.paymentBreakdown?.paid?.cashAmount?.toLocaleString() || 0}`} />
-                <SubMetric label="Online" value={`₹${stats.paymentBreakdown?.paid?.onlineAmount?.toLocaleString() || 0}`} />
+                <SubMetric label="Cash" value={checkPermission(PERMISSIONS.BILLING_VIEW) 
+                  ? `₹${stats.paymentBreakdown?.paid?.cashAmount?.toLocaleString() || 0}`
+                  : "₹ ****"
+                } />
+                <SubMetric label="Online" value={checkPermission(PERMISSIONS.BILLING_VIEW) 
+                  ? `₹${stats.paymentBreakdown?.paid?.onlineAmount?.toLocaleString() || 0}`
+                  : "₹ ****"
+                } />
               </GradientStatCard>
             </Grid>
 
@@ -158,12 +170,21 @@ export default function OrdersSummary({ isExpanded }) {
             <Grid item xs={12} md={4}>
               <GradientStatCard 
                 title="Unpaid Revenue" 
-                value={`₹${stats.paymentBreakdown?.unpaid?.totalAmount?.toLocaleString() || 0}`} 
+                value={checkPermission(PERMISSIONS.BILLING_VIEW) 
+                  ? `₹${stats.paymentBreakdown?.unpaid?.totalAmount?.toLocaleString() || 0}`
+                  : "₹ ****"
+                } 
                 Icon={AlertCircle} 
                 bgGradient="bg-linear-to-r from-[#f43f5e] to-[#e11d48]"
               >
-                <SubMetric label="Cash" value={`₹${stats.paymentBreakdown?.unpaid?.cashAmount?.toLocaleString() || 0}`} />
-                <SubMetric label="Online" value={`₹${stats.paymentBreakdown?.unpaid?.onlineAmount?.toLocaleString() || 0}`} />
+                <SubMetric label="Cash" value={checkPermission(PERMISSIONS.BILLING_VIEW) 
+                  ? `₹${stats.paymentBreakdown?.unpaid?.cashAmount?.toLocaleString() || 0}`
+                  : "₹ ****"
+                } />
+                <SubMetric label="Online" value={checkPermission(PERMISSIONS.BILLING_VIEW) 
+                  ? `₹${stats.paymentBreakdown?.unpaid?.onlineAmount?.toLocaleString() || 0}`
+                  : "₹ ****"
+                } />
               </GradientStatCard>
             </Grid>
           </Grid>

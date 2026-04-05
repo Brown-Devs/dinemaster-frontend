@@ -12,7 +12,6 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
-import DeleteIcon from "@mui/icons-material/Delete";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import ImageIcon from "@mui/icons-material/Image";
 import { useForm, useFieldArray } from "react-hook-form";
@@ -312,18 +311,21 @@ export default function CategoryFormModal({ open, onClose, category = null }) {
                       inputProps={{ min: 0, step: 0.5 }}
                     />
                   </div>
-                  <Tooltip title="Remove">
-                    <span>
+                  <div className="w-full flex justify-center">
+                    <Tooltip title="Remove Add-on">
                       <IconButton
                         size="small"
                         color="error"
                         onClick={() => remove(index)}
-                        sx={{ p: 0.75 }}
+                        sx={{
+                          bgcolor: "rgba(244, 67, 54, 0.05)",
+                          "&:hover": { bgcolor: "rgba(244, 67, 54, 0.1)" }
+                        }}
                       >
-                        <DeleteIcon fontSize="small" />
+                        <CloseIcon fontSize="small" />
                       </IconButton>
-                    </span>
-                  </Tooltip>
+                    </Tooltip>
+                  </div>
                 </div>
               ))}
               {fields.length === 0 && (

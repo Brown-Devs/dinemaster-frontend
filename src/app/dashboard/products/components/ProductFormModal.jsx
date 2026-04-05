@@ -15,7 +15,6 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
-import DeleteIcon from "@mui/icons-material/Delete";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import ImageIcon from "@mui/icons-material/Image";
 import { useForm, useFieldArray } from "react-hook-form";
@@ -29,6 +28,7 @@ export default function ProductFormModal({ open, onClose, product = null }) {
   const { user } = useAuthStore();
   const { companyCategoriesQuery, createProductMutation, updateProductMutation } = useBrandProducts();
   const { data: catData } = companyCategoriesQuery();
+  // Support for non-paginated response structure: { count, categories }
   const categories = catData?.data?.data?.categories || [];
 
   const [selectedFile, setSelectedFile] = useState(null);
@@ -377,19 +377,23 @@ export default function ProductFormModal({ open, onClose, product = null }) {
                         inputProps={{ min: 0, step: 0.5 }}
                       />
                     </div>
-                    <Tooltip title="Remove">
-                      <span>
-                        <IconButton
-                          size="small"
-                          color="error"
-                          disabled={fields.length === 1}
-                          onClick={() => remove(index)}
-                          sx={{ p: 0.75 }}
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </span>
-                    </Tooltip>
+                    <div className="w-full flex justify-center">
+                      {fields.length > 1 && (
+                        <Tooltip title="Remove Variant">
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => remove(index)}
+                            sx={{
+                              bgcolor: "rgba(244, 67, 54, 0.05)",
+                              "&:hover": { bgcolor: "rgba(244, 67, 54, 0.1)" }
+                            }}
+                          >
+                            <CloseIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                    </div>
                   </div>
                 ))}
                 {errors.variants?.message && (
