@@ -2,7 +2,7 @@
 import React from "react";
 import InnerDashboardLayout from "@/components/dashboard/InnerDashboardLayout";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { MODULES } from "@/lib/constants";
+import { MODULES, PERMISSIONS } from "@/lib/constants";
 import { usePermissions } from "@/hooks/usePermissions";
 import AccessDenied from "@/components/shared/AccessDenied";
 import DashboardSummary from "./(dashboard)/DashboardSummary";
@@ -14,9 +14,11 @@ import { Tooltip, IconButton } from "@mui/material";
 export default function CompanyDashboardPage() {
   const { user } = useAuthStore();
   const { refetchAll } = useDashboard();
+  const { isModuleEnabled, checkPermission } = usePermissions();
 
-  const { isModuleEnabled } = usePermissions();
-  if (!isModuleEnabled(MODULES.BASE)) {
+  const hasAccess = isModuleEnabled(MODULES.BASE) && checkPermission(PERMISSIONS.DASHBOARD_VIEW);
+
+  if (!hasAccess) {
     return (
       <InnerDashboardLayout>
         <AccessDenied

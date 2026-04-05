@@ -9,6 +9,8 @@ import { format } from "date-fns";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import OrderCard from "./components/OrderCard";
+import { usePermissions } from "@/hooks/usePermissions";
+import { MODULES, PERMISSIONS } from "@/lib/constants";
 
 export default function KitchenPage() {
   const { kitchenOrdersQuery } = useOrders();
@@ -94,6 +96,22 @@ export default function KitchenPage() {
     { label: "Delivery", value: "delivery", count: counts.delivery || 0 },
     { label: "Packing", value: "packing", count: counts.packing || 0 },
   ];
+
+  const { isModuleEnabled, checkPermission } = usePermissions();
+
+  const hasAccess = isModuleEnabled(MODULES.BASE) && checkPermission(PERMISSIONS.KITCHEN_VIEW);
+
+  if (!hasAccess) {
+    return (
+      <InnerDashboardLayout>
+        <AccessDenied
+          title="Access disabled"
+          description="Your organization is not allowed to access this."
+        />
+      </InnerDashboardLayout>
+    );
+  }
+
 
   return (
     <InnerDashboardLayout>
@@ -194,7 +212,7 @@ export default function KitchenPage() {
             <OrderCard
               key={order._id}
               order={order}
-              showPrepareAction={statusTab === "new"}
+              showPrepareAction={statusTab === "new" && checkPermission(PERMISSIONS.KITCHEN_UPDATE)}
               onStatusUpdated={refetch}
             />
           ))}

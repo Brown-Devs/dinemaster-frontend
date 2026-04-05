@@ -147,8 +147,8 @@ export default function Sidebar({
         label: "Kitchen",
         icon: <UtensilsCrossed size={20} />,
         path: "/dashboard/kitchen",
-        module: MODULES.PRODUCTS,
-        permissions: PERMISSIONS.PRODUCTS_VIEW,
+        module: MODULES.BASE,
+        permissions: PERMISSIONS.KITCHEN_VIEW,
       },
       {
         label: "Staff",

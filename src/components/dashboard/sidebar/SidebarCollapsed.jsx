@@ -185,8 +185,8 @@ export default function SidebarCollapsed({ onOpenFull }) {
         label: "Kitchen",
         icon: <UtensilsCrossed size={18} />,
         path: "/dashboard/kitchen",
-        module: MODULES.PRODUCTS,
-        permissions: PERMISSIONS.PRODUCTS_VIEW,
+        module: MODULES.BASE,
+        permissions: PERMISSIONS.KITCHEN_VIEW,
       },
       {
         label: "Staff",
@@ -303,11 +303,11 @@ export default function SidebarCollapsed({ onOpenFull }) {
       </Box>
 
       {/* FOOTER */}
-      <Box 
-        display="flex" 
-        flexDirection="column" 
-        alignItems="center" 
-        pb={1} 
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        pb={1}
         gap={1}
       >
         <Tooltip title="Expand Menu" placement="right">
