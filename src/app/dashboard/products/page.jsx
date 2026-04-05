@@ -178,17 +178,6 @@ export default function ProductsPage() {
             </div>
 
             <div className="flex gap-2 items-center flex-wrap">
-              {selectedIds.length > 0 && (
-                <Button
-                  variant="contained"
-                  color="error"
-                  size="small"
-                  startIcon={<DeleteSweepIcon />}
-                  onClick={handleBulkDelete}
-                >
-                  Delete ({selectedIds.length})
-                </Button>
-              )}
 
               <Tooltip title="Refresh">
                 <IconButton onClick={() => brandProductsData.refetch()} disabled={brandProductsData.isFetching}>
