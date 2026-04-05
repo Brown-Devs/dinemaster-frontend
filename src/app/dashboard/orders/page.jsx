@@ -102,10 +102,6 @@ export default function OrdersPage() {
     router.replace(`?${params.toString()}`);
   };
 
-  const hasAccess = isModuleEnabled(MODULES.ORDERS) && checkPermission(PERMISSIONS.ORDERS_VIEW);
-  if (!hasAccess) return <PermissionDenied />;
-
-  // Quick Filters
   const handleTodayOrders = () => {
     const now = format(new Date(), "yyyy-MM-dd");
     updateURL({ fromDate: now, toDate: now, page: 1 });
@@ -132,7 +128,19 @@ export default function OrdersPage() {
     toDate,
     minAmount,
     maxAmount
-  }), [searchParams]);
+  }), [
+    page,
+    limit,
+    searchQuery,
+    status,
+    orderType,
+    paymentStatus,
+    paymentMode,
+    fromDate,
+    toDate,
+    minAmount,
+    maxAmount
+  ]);
 
   const ordersData = ordersQuery(currentFilters);
   const apiData = ordersData.data?.data || { orders: [], totalCount: 0 };
@@ -150,6 +158,9 @@ export default function OrdersPage() {
   const handleOpenStatus = (order) => setUpdateModal({ open: true, type: 'status', order });
   const handleOpenPayment = (order) => setUpdateModal({ open: true, type: 'payment', order });
   const handleViewDetails = (order) => setViewModal({ open: true, order });
+
+  const hasAccess = isModuleEnabled(MODULES.ORDERS) && checkPermission(PERMISSIONS.ORDERS_VIEW);
+  if (!hasAccess) return <PermissionDenied />;
 
   return (
     <InnerDashboardLayout>

@@ -7,15 +7,19 @@ import {
   Collapse, 
   Skeleton,
   useMediaQuery,
-  useTheme
+  useTheme,
+  Chip
 } from '@mui/material';
 import { 
-  UtensilsCrossed, 
-  Package, 
+  ShoppingBasket, 
+  PlusCircle, 
+  ChefHat, 
   Truck, 
+  CheckCircle2, 
+  BadgeCheck, 
   AlertCircle,
-  ShoppingBasket,
-  IndianRupee 
+  UtensilsCrossed,
+  Package
 } from 'lucide-react';
 import { useOrders } from '@/hooks/admin/useOrders';
 import { usePermissions } from '@/hooks/usePermissions';
@@ -33,45 +37,42 @@ export default function OrdersSummary({ isExpanded }) {
 
   const stats = data?.data || {};
 
-  const GradientStatCard = ({ title, value, Icon, bgGradient, children }) => (
-    <div className={`relative overflow-hidden rounded-2xl ${bgGradient} ${isMobile ? 'p-4' : 'p-5'} transition-all duration-300 hover:-translate-y-1 group min-h-[140px] flex flex-col justify-between shadow-lg shadow-black/5`}>
+  const SimpleStatCard = ({ title, value, Icon, bgGradient, children }) => (
+    <div className={`relative overflow-hidden rounded-2xl ${bgGradient} p-4 transition-all duration-300 hover:-translate-y-1 group min-h-[120px] min-w-[130px] flex flex-col justify-between`}>
       {/* Subtle Pattern overlay */}
-      <div className="absolute inset-0 opacity-[0.08] pointer-events-none bg-[radial-gradient(circle_at_2px_2px,rgba(255,255,255,0.4)_1px,transparent_0)] bg-[length:24px_24px]" />
-
+      <div className="absolute inset-0 opacity-[0.05] pointer-events-none bg-[radial-gradient(circle_at_2px_2px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[length:24px_24px]" />
+      
       <div className="relative z-10 flex flex-col h-full text-white">
-        <div className="flex justify-between items-start">
-          {/* Main Info */}
+        <div className="flex justify-between items-start mb-2">
           <div className="flex-1">
-            <p className="text-[12px] font-bold text-white/90 tracking-tight mb-2 uppercase opacity-80">{title}</p>
+            <p className="text-[11px] font-bold text-white/80 uppercase tracking-wider mb-1">{title}</p>
             {isLoading ? (
-              <Skeleton variant="text" width="80%" height={40} sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
+              <Skeleton variant="text" width={40} height={32} sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
             ) : (
-              <h3 className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-extrabold tracking-tighter mb-1`}>
+              <h3 className="text-2xl font-extrabold tracking-tighter">
                 {value}
               </h3>
             )}
           </div>
-
-          {/* Icon on the Right */}
-          <div className={`${isMobile ? 'p-2' : 'p-2.5'} bg-white/20 rounded-xl backdrop-blur-sm ml-4`}>
-            {Icon && <Icon className="text-white" size={isMobile ? 18 : 22} />}
+          <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm ml-3">
+            {Icon && <Icon className="text-white" size={18} />}
           </div>
         </div>
-
-        {/* Sub-stats / Extra Content */}
-        <div className={`mt-1 flex flex-col gap-1 border-t border-white/10 ${isMobile ? 'pt-1.5' : 'pt-2'}`}>
-          <div className={`flex flex-wrap ${isMobile ? 'gap-x-3 gap-y-1' : 'gap-x-5 gap-y-1.5'} mt-0.5`}>
+        
+        {children && (
+          <div className="mt-2 flex flex-wrap gap-1.5 border-t border-white/10 pt-2">
             {children}
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
 
-  const SubMetric = ({ label, value }) => (
-    <div className="flex items-center gap-1">
-      <span className={`${isMobile ? 'text-[11px]' : 'text-[13px]'} capitalize font-semibold text-white/60`}>{label}:</span>
-      <span className={`${isMobile ? 'text-[11px]' : 'text-[13px]'} font-bold text-white`}>{value || 0}</span>
+  const MiniChip = ({ label, value, icon: Icon }) => (
+    <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/10 text-[10px] font-bold text-white/90 border border-white/5 backdrop-blur-sm">
+      {Icon && <Icon size={10} />}
+      <span>{label}</span>
+      <span className="text-white font-extrabold">{value}</span>
     </div>
   );
 
@@ -81,111 +82,82 @@ export default function OrdersSummary({ isExpanded }) {
         <Box sx={{ mb: 2 }}>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-1.5 h-6 bg-blue-600 rounded-full" />
-            <h3 className="text-xl font-extrabold tracking-tighter text-foreground">Today's Order Summary</h3>
+            <h3 className="text-xl font-extrabold tracking-tighter text-foreground">Today's Summary</h3>
           </div>
 
-          <Grid container spacing={isMobile ? 1.5 : 2.5}>
-            {/* Total Orders */}
-            <Grid item xs={12} md={4}>
-              <GradientStatCard 
+          <Grid container spacing={2}>
+            {/* 1. Total Orders */}
+            <Grid item xs={12} sm={6} md={3} lg={3}>
+              <SimpleStatCard 
                 title="Total Orders" 
-                value={stats.todayTotal} 
-                Icon={ShoppingBasket} 
-                bgGradient="bg-linear-to-r from-[#8b5cf6] to-[#7c3aed]"
-              >
-                <SubMetric label="Dine-in" value={stats.typeBreakdown?.dinein?.new + stats.typeBreakdown?.dinein?.prepared + stats.typeBreakdown?.dinein?.delivered} />
-                <SubMetric label="Packing" value={stats.typeBreakdown?.packing?.new + stats.typeBreakdown?.packing?.prepared + stats.typeBreakdown?.packing?.delivered} />
-                <SubMetric label="Delivery" value={stats.typeBreakdown?.delivery?.new + stats.typeBreakdown?.delivery?.prepared + stats.typeBreakdown?.delivery?.out_for_delivery + stats.typeBreakdown?.delivery?.delivered} />
-              </GradientStatCard>
-            </Grid>
-
-            {/* Dine In Breakdown */}
-            <Grid item xs={12} md={4}>
-              <GradientStatCard 
-                title="Dine In Status" 
-                value={Object.values(stats.typeBreakdown?.dinein || {}).reduce((a, b) => a + b, 0)} 
-                Icon={UtensilsCrossed} 
-                bgGradient="bg-linear-to-r from-[#10b981] to-[#059669]"
-              >
-                <SubMetric label="New" value={stats.typeBreakdown?.dinein?.new} />
-                <SubMetric label="Prepared" value={stats.typeBreakdown?.dinein?.prepared} />
-                <SubMetric label="Out for Delivery" value={stats.typeBreakdown?.dinein?.out_for_delivery} />
-                <SubMetric label="Delivered" value={stats.typeBreakdown?.dinein?.delivered} />
-              </GradientStatCard>
-            </Grid>
-
-            {/* Packing Breakdown */}
-            <Grid item xs={12} md={4}>
-              <GradientStatCard 
-                title="Packing Status" 
-                value={Object.values(stats.typeBreakdown?.packing || {}).reduce((a, b) => a + b, 0)} 
-                Icon={Package} 
+                value={stats.todayTotal || 0} 
+                Icon={ShoppingBasket}
                 bgGradient="bg-linear-to-r from-[#0ea5e9] to-[#2563eb]"
               >
-                <SubMetric label="New" value={stats.typeBreakdown?.packing?.new} />
-                <SubMetric label="Prepared" value={stats.typeBreakdown?.packing?.prepared} />
-                <SubMetric label="Out for Delivery" value={stats.typeBreakdown?.packing?.out_for_delivery} />
-                <SubMetric label="Delivered" value={stats.typeBreakdown?.packing?.delivered} />
-              </GradientStatCard>
+                <MiniChip label="Dine-in" value={stats.typeCounts?.dinein || 0} icon={UtensilsCrossed} />
+                <MiniChip label="Packing" value={stats.typeCounts?.packing || 0} icon={Package} />
+                <MiniChip label="Delivery" value={stats.typeCounts?.delivery || 0} icon={Truck} />
+              </SimpleStatCard>
             </Grid>
 
-            {/* Home Delivery */}
-            <Grid item xs={12} md={4}>
-              <GradientStatCard 
-                title="Home Delivery" 
-                value={Object.values(stats.typeBreakdown?.delivery || {}).reduce((a, b) => a + b, 0)} 
-                Icon={Truck} 
+            {/* 2. New Orders */}
+            <Grid item xs={6} sm={6} md={3} lg={1.5}>
+              <SimpleStatCard 
+                title="New" 
+                value={stats.statusCounts?.new || 0} 
+                Icon={PlusCircle}
+                bgGradient="bg-linear-to-r from-[#8b5cf6] to-[#7c3aed]"
+              />
+            </Grid>
+
+            {/* 3. Prepared Orders */}
+            <Grid item xs={6} sm={6} md={3} lg={1.5}>
+              <SimpleStatCard 
+                title="Prepared" 
+                value={stats.statusCounts?.prepared || 0} 
+                Icon={ChefHat}
                 bgGradient="bg-linear-to-r from-[#f59e0b] to-[#d97706]"
-              >
-                <SubMetric label="New" value={stats.typeBreakdown?.delivery?.new} />
-                <SubMetric label="Prepared" value={stats.typeBreakdown?.delivery?.prepared} />
-                <SubMetric label="Out for Delivery" value={stats.typeBreakdown?.delivery?.out_for_delivery} />
-                <SubMetric label="Delivered" value={stats.typeBreakdown?.delivery?.delivered} />
-              </GradientStatCard>
+              />
             </Grid>
 
-            {/* Paid Revenue */}
-            <Grid item xs={12} md={4}>
-              <GradientStatCard 
-                title="Paid Revenue" 
-                value={checkPermission(PERMISSIONS.BILLING_VIEW) 
-                  ? `₹${stats.paymentBreakdown?.paid?.totalAmount?.toLocaleString() || 0}`
-                  : "₹ ****"
-                } 
-                Icon={IndianRupee} 
-                bgGradient="bg-linear-to-r from-[#2563eb] to-[#1e40af]"
-              >
-                <SubMetric label="Cash" value={checkPermission(PERMISSIONS.BILLING_VIEW) 
-                  ? `₹${stats.paymentBreakdown?.paid?.cashAmount?.toLocaleString() || 0}`
-                  : "₹ ****"
-                } />
-                <SubMetric label="Online" value={checkPermission(PERMISSIONS.BILLING_VIEW) 
-                  ? `₹${stats.paymentBreakdown?.paid?.onlineAmount?.toLocaleString() || 0}`
-                  : "₹ ****"
-                } />
-              </GradientStatCard>
+            {/* 4. Out for delivery */}
+            <Grid item xs={6} sm={6} md={3} lg={1.5}>
+              <SimpleStatCard 
+                title="Out for Delivery" 
+                value={stats.statusCounts?.out_for_delivery || 0} 
+                Icon={Truck}
+                bgGradient="bg-linear-to-r from-[#6366f1] to-[#4f46e5]"
+              />
             </Grid>
 
-            {/* Unpaid Revenue */}
-            <Grid item xs={12} md={4}>
-              <GradientStatCard 
-                title="Unpaid Revenue" 
-                value={checkPermission(PERMISSIONS.BILLING_VIEW) 
-                  ? `₹${stats.paymentBreakdown?.unpaid?.totalAmount?.toLocaleString() || 0}`
-                  : "₹ ****"
-                } 
-                Icon={AlertCircle} 
+            {/* 5. Delivered */}
+            <Grid item xs={6} sm={6} md={3} lg={1.5}>
+              <SimpleStatCard 
+                title="Delivered" 
+                value={stats.statusCounts?.delivered || 0} 
+                Icon={CheckCircle2}
+                bgGradient="bg-linear-to-r from-[#10b981] to-[#059669]"
+              />
+            </Grid>
+
+            {/* 6. Paid Orders */}
+            <Grid item xs={6} sm={6} md={3} lg={1.5}>
+              <SimpleStatCard 
+                title="Paid Orders" 
+                value={stats.paymentCounts?.paid || 0} 
+                Icon={BadgeCheck}
+                bgGradient="bg-linear-to-r from-[#14b8a6] to-[#0d9488]"
+              />
+            </Grid>
+
+            {/* 7. Unpaid Orders */}
+            <Grid item xs={6} sm={6} md={3} lg={1.5}>
+              <SimpleStatCard 
+                title="Unpaid Orders" 
+                value={stats.paymentCounts?.unpaid || 0} 
+                Icon={AlertCircle}
                 bgGradient="bg-linear-to-r from-[#f43f5e] to-[#e11d48]"
-              >
-                <SubMetric label="Cash" value={checkPermission(PERMISSIONS.BILLING_VIEW) 
-                  ? `₹${stats.paymentBreakdown?.unpaid?.cashAmount?.toLocaleString() || 0}`
-                  : "₹ ****"
-                } />
-                <SubMetric label="Online" value={checkPermission(PERMISSIONS.BILLING_VIEW) 
-                  ? `₹${stats.paymentBreakdown?.unpaid?.onlineAmount?.toLocaleString() || 0}`
-                  : "₹ ****"
-                } />
-              </GradientStatCard>
+              />
             </Grid>
           </Grid>
         </Box>
