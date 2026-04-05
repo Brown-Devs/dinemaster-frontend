@@ -13,8 +13,13 @@ import { Button, Typography, CircularProgress } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useCartStore } from "@/stores/useCartStore";
+import { usePermissions } from "@/hooks/usePermissions";
+import { PERMISSIONS, MODULES } from "@/lib/constants";
+import PermissionDenied from "@/components/shared/PermissionDenied";
 
 export default function BillingPage() {
+  const { isModuleEnabled, checkPermission } = usePermissions();
+
   const [step, setStep] = useState(1); // 1 = Menu, 2 = Customer details / Checkout, 3 = Success
   const [orderResult, setOrderResult] = useState(null);
 
@@ -144,22 +149,24 @@ export default function BillingPage() {
                   <Typography variant="caption" sx={{ color: "var(--muted)", display: 'block' }}>Total Payable Amount</Typography>
                   <Typography variant="h4" fontWeight="900" color="primary">₹{getCartTotal()}</Typography>
                 </div>
-                <Button
-                  variant="contained"
-                  size="large"
-                  disabled={createOrderMutation.isPending}
-                  startIcon={createOrderMutation.isPending ? <CircularProgress size={20} color="inherit" /> : <CheckCircleIcon />}
-                  onClick={handlePlaceOrder}
-                  sx={{ px: 8, py: 1.5, borderRadius: 3, fontWeight: '900', fontSize: 18, textTransform: 'none', boxShadow: 4 }}
-                >
-                  {createOrderMutation.isPending ? "Creating Order..." : "Complete Order"}
-                </Button>
+                {checkPermission(PERMISSIONS.BILLING_CREATE) && (
+                  <Button
+                    variant="contained"
+                    size="large"
+                    disabled={createOrderMutation.isPending}
+                    startIcon={createOrderMutation.isPending ? <CircularProgress size={20} color="inherit" /> : <CheckCircleIcon />}
+                    onClick={handlePlaceOrder}
+                    sx={{ px: 8, py: 1.5, borderRadius: 3, fontWeight: '900', fontSize: 18, textTransform: 'none', boxShadow: 4 }}
+                  >
+                    {createOrderMutation.isPending ? "Creating Order..." : "Complete Order"}
+                  </Button>
+                )}
               </div>
             </div>
           </div>
         )}
 
-        {step === 3 && (
+        {step === 3 && orderResult && (
           <div className="flex-1 h-full flex items-center justify-center">
             <OrderSuccessView
               order={orderResult}

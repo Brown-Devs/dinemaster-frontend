@@ -17,7 +17,10 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import AddIcon from "@mui/icons-material/Add";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import SearchIcon from "@mui/icons-material/Search";
-import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
+
+import { usePermissions } from "@/hooks/usePermissions";
+import { PERMISSIONS, MODULES } from "@/lib/constants";
+import PermissionDenied from "@/components/shared/PermissionDenied";
 
 import { useBrandProducts } from "@/hooks/admin/useBrandProducts";
 import ProductCardsGrid from "./components/ProductCardsGrid";
@@ -25,6 +28,8 @@ import ImportProductsDrawer from "./components/ImportProductsDrawer";
 import ProductFormModal from "./components/ProductFormModal";
 
 export default function ProductsPage() {
+  const { isModuleEnabled, checkPermission } = usePermissions();
+
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -34,7 +39,6 @@ export default function ProductsPage() {
   const limit = parseInt(searchParams.get("limit") || "10");
 
   // Local State
-  const [selectedIds, setSelectedIds] = useState([]);
   const [searchInput, setSearchInput] = useState(searchStr);
   const debouncedSearch = useDebounce(searchInput, 500);
 
@@ -62,7 +66,7 @@ export default function ProductsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
 
-  const { brandProductsQuery, bulkImportMutation, bulkDeleteMutation } = useBrandProducts();
+  const { brandProductsQuery, bulkImportMutation } = useBrandProducts();
 
   const brandProductsData = brandProductsQuery({
     page,
@@ -86,13 +90,6 @@ export default function ProductsPage() {
       }
     });
     router.replace(`?${params.toString()}`);
-  };
-
-  const handleBulkDelete = async () => {
-    if (window.confirm(`Are you sure you want to delete ${selectedIds.length} products?`)) {
-      await bulkDeleteMutation.mutateAsync({ ids: selectedIds });
-      setSelectedIds([]);
-    }
   };
 
   const handleBulkImport = async () => {
@@ -121,24 +118,8 @@ export default function ProductsPage() {
     setImportDrawerOpen(true);
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this product?")) {
-      bulkDeleteMutation.mutateAsync({ ids: [id] });
-    }
-  };
-
-  const handleSelectAllOnPage = (event) => {
-    if (event.target.checked) {
-      const pageIds = products.map((n) => n._id);
-      setSelectedIds((prev) => [...new Set([...prev, ...pageIds])]);
-    } else {
-      const pageIds = products.map((n) => n._id);
-      setSelectedIds((prev) => prev.filter((id) => !pageIds.includes(id)));
-    }
-  };
-
-  const allOnPageSelected = products.length > 0 && products.every((p) => selectedIds.includes(p._id));
-  const someOnPageSelected = products.some((p) => selectedIds.includes(p._id)) && !allOnPageSelected;
+  const hasAccess = isModuleEnabled(MODULES.PRODUCTS) && checkPermission(PERMISSIONS.PRODUCTS_VIEW);
+  if (!hasAccess) return <PermissionDenied />;
 
   return (
     <InnerDashboardLayout>
@@ -151,21 +132,25 @@ export default function ProductsPage() {
         </div>
 
         <div className="flex gap-2">
-          <Button
-            variant="outlined"
-            startIcon={<CloudDownloadIcon />}
-            onClick={handleOpenImportDrawer}
-          >
-            Import Products
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            color="primary"
-            onClick={handleOpenAddModal}
-          >
-            Add Product
-          </Button>
+          {checkPermission(PERMISSIONS.PRODUCTS_CREATE) && (
+            <Button
+              variant="outlined"
+              startIcon={<CloudDownloadIcon />}
+              onClick={handleOpenImportDrawer}
+            >
+              Import Products
+            </Button>
+          )}
+          {checkPermission(PERMISSIONS.PRODUCTS_CREATE) && (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              color="primary"
+              onClick={handleOpenAddModal}
+            >
+              Add Product
+            </Button>
+          )}
         </div>
       </div>
 
@@ -174,13 +159,6 @@ export default function ProductsPage() {
           {/* Toolbar */}
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex gap-2 items-center">
-              <Checkbox
-                size="small"
-                checked={allOnPageSelected}
-                indeterminate={someOnPageSelected}
-                onChange={handleSelectAllOnPage}
-                sx={{ p: 0.5 }}
-              />
               <TextField
                 size="small"
                 placeholder="Search products..."
@@ -198,17 +176,6 @@ export default function ProductsPage() {
             </div>
 
             <div className="flex gap-2 items-center flex-wrap">
-              {selectedIds.length > 0 && (
-                <Button
-                  variant="contained"
-                  color="error"
-                  size="small"
-                  startIcon={<DeleteSweepIcon />}
-                  onClick={handleBulkDelete}
-                >
-                  Delete ({selectedIds.length})
-                </Button>
-              )}
               
               <Tooltip title="Refresh">
                 <IconButton onClick={() => brandProductsData.refetch()} disabled={brandProductsData.isFetching}>
@@ -227,10 +194,7 @@ export default function ProductsPage() {
             total={total}
             onPageChange={(p) => updateURL({ page: p })}
             setLimit={(l) => updateURL({ limit: l, page: 1 })}
-            selectedIds={selectedIds}
-            onSelectChange={setSelectedIds}
             onEdit={handleOpenEditModal}
-            onDelete={handleDelete}
           />
         </div>
       </Box>

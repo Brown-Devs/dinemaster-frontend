@@ -17,8 +17,9 @@ import {
   TablePagination,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
+import { usePermissions } from "@/hooks/usePermissions";
+import { PERMISSIONS } from "@/lib/constants";
 
 export default function CategoriesTable({
   categories = [],
@@ -29,8 +30,8 @@ export default function CategoriesTable({
   onPageChange,
   setLimit,
   onEdit,
-  onDelete,
 }) {
+  const { checkPermission } = usePermissions();
   if (loading) {
     return (
       <TableContainer component={Paper} elevation={0} sx={{ border: "1px solid var(--border)", background: "transparent", borderRadius: 3 }}>
@@ -132,16 +133,13 @@ export default function CategoriesTable({
                 </TableCell>
                 <TableCell align="center">
                   <div className="flex justify-center gap-1">
-                    <Tooltip title="Edit Category">
-                      <IconButton size="small" onClick={() => onEdit(category)}>
-                        <EditIcon fontSize="small" sx={{ color: "var(--fg)" }} />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Delete Category">
-                      <IconButton size="small" onClick={() => onDelete(category._id)}>
-                        <DeleteIcon fontSize="small" color="error" />
-                      </IconButton>
-                    </Tooltip>
+                    {checkPermission(PERMISSIONS.CATEGORIES_UPDATE) && (
+                      <Tooltip title="Edit Category">
+                        <IconButton size="small" onClick={() => onEdit(category)}>
+                          <EditIcon fontSize="small" sx={{ color: "var(--fg)" }} />
+                        </IconButton>
+                      </Tooltip>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>

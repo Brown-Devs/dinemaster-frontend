@@ -15,8 +15,13 @@ import { useCategories } from "@/hooks/admin/useCategories";
 import { useDebounce } from "@/hooks/useDebounce";
 import CategoriesTable from "./components/CategoriesTable";
 import CategoryFormModal from "./components/CategoryFormModal";
+import { usePermissions } from "@/hooks/usePermissions";
+import { PERMISSIONS, MODULES } from "@/lib/constants";
+import PermissionDenied from "@/components/shared/PermissionDenied";
 
 export default function CategoriesPage() {
+  const { isModuleEnabled, checkPermission } = usePermissions();
+
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -33,7 +38,7 @@ export default function CategoriesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
 
-  const { categoriesQuery, deleteCategoryMutation } = useCategories();
+  const { categoriesQuery } = useCategories();
 
   const categoriesData = categoriesQuery({
     page,
@@ -80,11 +85,8 @@ export default function CategoriesPage() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this category?")) {
-      deleteCategoryMutation.mutateAsync(id);
-    }
-  };
+  const hasAccess = isModuleEnabled(MODULES.CATEGORIES) && checkPermission(PERMISSIONS.CATEGORIES_VIEW);
+  if (!hasAccess) return <PermissionDenied />;
 
   return (
     <InnerDashboardLayout>
@@ -96,15 +98,17 @@ export default function CategoriesPage() {
           </p>
         </div>
 
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          color="primary"
-          onClick={handleOpenAddModal}
-          sx={{ borderRadius: 2, textTransform: "none", fontWeight: 600 }}
-        >
-          Add Category
-        </Button>
+        {checkPermission(PERMISSIONS.CATEGORIES_CREATE) && (
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            color="primary"
+            onClick={handleOpenAddModal}
+            sx={{ borderRadius: 2, textTransform: "none", fontWeight: 600 }}
+          >
+            Add Category
+          </Button>
+        )}
       </div>
 
       <Box sx={{ width: "100%" }}>
@@ -137,7 +141,6 @@ export default function CategoriesPage() {
             onPageChange={(p) => updateURL({ page: p })}
             setLimit={(l) => updateURL({ limit: l, page: 1 })}
             onEdit={handleOpenEditModal}
-            onDelete={handleDelete}
           />
         </div>
       </Box>
