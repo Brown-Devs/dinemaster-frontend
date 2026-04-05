@@ -11,6 +11,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import OrderCard from "./components/OrderCard";
 import { usePermissions } from "@/hooks/usePermissions";
 import { MODULES, PERMISSIONS } from "@/lib/constants";
+import AccessDenied from "@/components/shared/AccessDenied";
 
 export default function KitchenPage() {
   const { kitchenOrdersQuery } = useOrders();

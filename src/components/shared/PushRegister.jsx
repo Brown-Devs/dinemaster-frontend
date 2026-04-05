@@ -7,6 +7,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { getDeviceInfo } from "@/utils/device";
 
 function urlBase64ToUint8Array(base64String) {
+    if (!base64String) return null;
     const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
     const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
     const rawData = window.atob(base64);
@@ -22,7 +23,7 @@ export default function PushRegister() {
         (async () => {
             if (!user || !sessionId) return;
             const deviceInfo = getDeviceInfo();
-            if (!deviceInfo.isMobile) return; // only mobile  register
+            // if (!deviceInfo.isMobile) return; // removed to allow all devices (kitchen staff use tablets/desktops)
 
             if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
 
@@ -31,14 +32,24 @@ export default function PushRegister() {
                 const reg = await navigator.serviceWorker.ready;
                 let subscription = await reg.pushManager.getSubscription();
                 if (!subscription) {
+                    const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+                    if (!vapidKey) {
+                        console.warn("PushRegister: NEXT_PUBLIC_VAPID_PUBLIC_KEY missing");
+                        return;
+                    }
+
                     const perm = await Notification.requestPermission();
                     if (perm !== "granted") {
                         console.warn("Notification permission denied");
                         return;
                     }
+
+                    const applicationServerKey = urlBase64ToUint8Array(vapidKey);
+                    if (!applicationServerKey) return;
+
                     subscription = await reg.pushManager.subscribe({
                         userVisibleOnly: true,
-                        applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY)
+                        applicationServerKey
                     });
                 }
 
@@ -51,7 +62,7 @@ export default function PushRegister() {
                 }
 
                 // send to backend
-                await api.post("/push/save-subscription", {
+                await api.post("/subscriptions", {
                     subscription,
                     deviceId,
                     deviceInfo,
