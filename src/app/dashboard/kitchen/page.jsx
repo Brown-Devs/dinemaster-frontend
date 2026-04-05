@@ -5,7 +5,7 @@ import InnerDashboardLayout from "@/components/dashboard/InnerDashboardLayout";
 import { useOrders } from "@/hooks/admin/useOrders";
 import { IconButton, Tooltip, CircularProgress } from "@mui/material";
 import { RefreshCw, UtensilsCrossed, CalendarDays } from "lucide-react";
-import { format } from "date-fns";
+import { format, startOfDay, endOfDay } from "date-fns";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import OrderCard from "./components/OrderCard";
@@ -32,7 +32,8 @@ export default function KitchenPage() {
   } = kitchenOrdersQuery({
     status: statusTab,
     orderType: typeFilter,
-    date: format(selectedDate, "yyyy-MM-dd"),
+    fromDate: startOfDay(selectedDate).toISOString(),
+    toDate: endOfDay(selectedDate).toISOString(),
     limit: 10,
   });
 
