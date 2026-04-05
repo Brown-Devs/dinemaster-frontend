@@ -18,7 +18,6 @@ import {
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import MyLocationIcon from "@mui/icons-material/MyLocation";
 import { formatDateWithTime } from "@/lib/services/dateFormat";
@@ -32,7 +31,6 @@ export default function BrandProductsTable({
   selectedIds = [],
   onSelectChange,
   onEdit,
-  onDelete,
 }) {
   const products = apiData?.products || [];
   const currentPage = apiData?.pagination?.page || 1;
@@ -199,11 +197,6 @@ export default function BrandProductsTable({
                       <Tooltip title="Edit">
                         <IconButton size="small" onClick={() => onEdit(product)}>
                           <EditIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Delete">
-                        <IconButton size="small" color="error" onClick={() => onDelete(product._id)}>
-                          <DeleteIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
                     </TableCell>

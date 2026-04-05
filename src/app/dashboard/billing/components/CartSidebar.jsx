@@ -5,12 +5,14 @@ import { IconButton, Button, Divider, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useCartStore } from "@/stores/useCartStore";
+import { usePermissions } from "@/hooks/usePermissions";
+import { PERMISSIONS } from "@/lib/constants";
 
 export default function CartSidebar({ onConfirm, confirmText = "Confirm Order", hideConfirm = false, readOnly = false }) {
   const { cart, updateQuantity, removeFromCart, discountAmount, setDiscount } = useCartStore();
+  const { checkPermission } = usePermissions();
 
   const subtotal = cart.reduce((sum, item) => sum + (item.pricePerItem * item.quantity), 0);
   const total = Math.max(0, subtotal - discountAmount);
@@ -96,7 +98,7 @@ export default function CartSidebar({ onConfirm, confirmText = "Confirm Order", 
                 </div>
                 {!readOnly && (
                   <IconButton size="small" onClick={() => removeFromCart(item.cartId)} sx={{ color: 'var(--muted)', '&:hover': { color: 'error.main'}, p: 0.5 }}>
-                    <DeleteOutlineIcon fontSize="small" />
+                    <CloseIcon fontSize="small" />
                   </IconButton>
                 )}
               </div>
@@ -139,7 +141,7 @@ export default function CartSidebar({ onConfirm, confirmText = "Confirm Order", 
           <Typography variant="h5" fontWeight="900" sx={{ color: "var(--fg)" }}>₹{total}</Typography>
         </div>
 
-        {!hideConfirm && (
+        {!hideConfirm && checkPermission(PERMISSIONS.BILLING_CREATE) && (
           <Button 
             variant="contained" 
             fullWidth 

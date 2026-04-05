@@ -16,7 +16,6 @@ export default function ProductCardsGrid({
   selectedIds = [],
   onSelectChange,
   onEdit,
-  onDelete,
 }) {
   const handleSelectOne = (id) => {
     const idx = selectedIds.indexOf(id);
@@ -97,7 +96,6 @@ export default function ProductCardsGrid({
             isSelected={selectedIds.includes(product._id)}
             onSelect={handleSelectOne}
             onEdit={onEdit}
-            onDelete={onDelete}
             showActions={true}
           />
         ))}

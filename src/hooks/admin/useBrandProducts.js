@@ -55,7 +55,7 @@ export const useBrandProducts = () => {
     const companyCategoriesQuery = () => {
         return useQuery({
             queryKey: ['companyCategories'],
-            queryFn: () => api.get(`/categories`), // Assuming there's a GET /categories that returns company categories
+            queryFn: () => api.get(`/categories/all`), // Fetch all categories for the dropdown
             staleTime: 1000 * 60 * 5,
         });
     }

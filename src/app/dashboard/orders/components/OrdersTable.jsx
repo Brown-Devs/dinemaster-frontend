@@ -32,6 +32,8 @@ import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { format } from "date-fns";
 import { TablePagination } from "@mui/material";
+import { usePermissions } from "@/hooks/usePermissions";
+import { PERMISSIONS } from "@/lib/constants";
 
 const statusColors = {
   new: { bg: "#e3f2fd", text: "#1976d2", label: "New" },
@@ -65,6 +67,7 @@ export default function OrdersTable({
   onUpdatePayment,
   onViewDetails
 }) {
+  const { checkPermission } = usePermissions();
 
   return (
     <Box sx={{ width: '100%', overflow: 'hidden' }}>
@@ -161,9 +164,11 @@ export default function OrdersTable({
                           borderRadius: '6px'
                         }}
                       />
-                      <IconButton size="small" onClick={() => onUpdateStatus(order)} disabled={order.status === 'cancelled'}>
-                        <EditIcon sx={{ fontSize: 14, color: "var(--muted)" }} />
-                      </IconButton>
+                      {checkPermission(PERMISSIONS.ORDERS_UPDATE) && (
+                        <IconButton size="small" onClick={() => onUpdateStatus(order)} disabled={order.status === 'cancelled'}>
+                          <EditIcon sx={{ fontSize: 14, color: "var(--muted)" }} />
+                        </IconButton>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell>
@@ -175,9 +180,11 @@ export default function OrdersTable({
                         color={order.paymentStatus === 'paid' ? "success" : "error"}
                         sx={{ fontWeight: 'bold' }}
                       />
-                      <IconButton size="small" onClick={() => onUpdatePayment(order)} disabled={order.status === 'cancelled'}>
-                        <EditIcon sx={{ fontSize: 14, color: "var(--muted)" }} />
-                      </IconButton>
+                      {checkPermission(PERMISSIONS.ORDERS_UPDATE) && (
+                        <IconButton size="small" onClick={() => onUpdatePayment(order)} disabled={order.status === 'cancelled'}>
+                          <EditIcon sx={{ fontSize: 14, color: "var(--muted)" }} />
+                        </IconButton>
+                      )}
                     </div>
                     <Typography variant="caption" sx={{ color: "var(--muted)", display: 'block', mt: 0.5, fontSize: 10 }}>
                       {order.paymentMode?.toUpperCase()}

@@ -16,7 +16,8 @@ import {
   Tooltip,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { usePermissions } from "@/hooks/usePermissions";
+import { PERMISSIONS } from "@/lib/constants";
 
 export default function MasterProductsTable({
   apiData,
@@ -26,10 +27,10 @@ export default function MasterProductsTable({
   setLimit,
   onPageChange,
   onEdit,
-  onDelete,
   selectedIds = [],
   onSelectChange,
 }) {
+  const { checkPermission } = usePermissions();
   const currentPage = apiData?.pagination?.page || 1;
   const total = apiData?.pagination?.totalCount || 0;
 
@@ -218,23 +219,16 @@ export default function MasterProductsTable({
                     </TableCell>
 
                     <TableCell align="right">
-                      <Tooltip title="Edit">
-                        <IconButton
-                          size="small"
-                          onClick={() => onEdit?.(product)}
-                        >
-                          <EditIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Delete">
-                        <IconButton
-                          size="small"
-                          color="error"
-                          onClick={() => onDelete?.(product._id)}
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
+                      {checkPermission(PERMISSIONS.MASTER_CATALOG_UPDATE) && (
+                        <Tooltip title="Edit">
+                          <IconButton
+                            size="small"
+                            onClick={() => onEdit?.(product)}
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      )}
                     </TableCell>
                   </TableRow>
                 );

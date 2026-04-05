@@ -3,17 +3,18 @@
 import React from "react";
 import { Checkbox, Chip, IconButton, Tooltip } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
+import { usePermissions } from "@/hooks/usePermissions";
+import { PERMISSIONS } from "@/lib/constants";
 
 export default function ProductCard({
   product,
   isSelected = false,
   onSelect,
   onEdit,
-  onDelete,
   showActions = false,
 }) {
+  const { checkPermission } = usePermissions();
   return (
     <div
       className={`
@@ -136,39 +137,21 @@ export default function ProductCard({
           </div>
 
           {/* Actions - Always Bottom Right Position */}
-          {showActions && (onEdit || onDelete) && (
-            <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300">
-              {onEdit && (
-                <Tooltip title="Edit" placement="top">
-                  <IconButton
-                    size="small"
-                    onClick={(e) => { e.stopPropagation(); onEdit(product); }}
-                    sx={{
-                      p: 0.6,
-                      backgroundColor: 'var(--cardsBG)',
-                      '&:hover': { backgroundColor: 'var(--border)' }
-                    }}
-                  >
-                    <EditIcon sx={{ fontSize: 16 }} />
-                  </IconButton>
-                </Tooltip>
-              )}
-              {onDelete && (
-                <Tooltip title="Delete" placement="top">
-                  <IconButton
-                    size="small"
-                    color="error"
-                    onClick={(e) => { e.stopPropagation(); onDelete(product._id); }}
-                    sx={{
-                      p: 0.6,
-                      backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                      '&:hover': { backgroundColor: 'rgba(239, 68, 68, 0.2)' }
-                    }}
-                  >
-                    <DeleteIcon sx={{ fontSize: 16 }} />
-                  </IconButton>
-                </Tooltip>
-              )}
+          {checkPermission(PERMISSIONS.PRODUCTS_UPDATE) && onEdit && (
+            <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm group-hover:opacity-100 transition-all duration-300">
+              <Tooltip title="Edit" placement="top">
+                <IconButton
+                  size="small"
+                  onClick={(e) => { e.stopPropagation(); onEdit(product); }}
+                  sx={{
+                    p: 0.6,
+                    backgroundColor: 'var(--cardsBG)',
+                    '&:hover': { backgroundColor: 'var(--border)' }
+                  }}
+                >
+                  <EditIcon sx={{ fontSize: 16 }} />
+                </IconButton>
+              </Tooltip>
             </div>
           )}
         </div>

@@ -32,8 +32,13 @@ import { UpdatePaymentDialog } from "./components/UpdatePaymentDialog";
 import { ViewOrderDialog } from "./components/ViewOrderDialog";
 import { format, subDays } from "date-fns";
 import OrdersSummary from "./components/OrdersSummary";
+import { usePermissions } from "@/hooks/usePermissions";
+import { PERMISSIONS, MODULES } from "@/lib/constants";
+import PermissionDenied from "@/components/shared/PermissionDenied";
 
 export default function OrdersPage() {
+  const { isModuleEnabled, checkPermission } = usePermissions();
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const { ordersQuery } = useOrders();
@@ -96,6 +101,9 @@ export default function OrdersPage() {
     });
     router.replace(`?${params.toString()}`);
   };
+
+  const hasAccess = isModuleEnabled(MODULES.ORDERS) && checkPermission(PERMISSIONS.ORDERS_VIEW);
+  if (!hasAccess) return <PermissionDenied />;
 
   // Quick Filters
   const handleTodayOrders = () => {

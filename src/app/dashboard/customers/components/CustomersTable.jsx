@@ -16,7 +16,7 @@ import {
   Chip,
   Avatar,
 } from "@mui/material";
-import { User, Phone, ShoppingBag, Calendar, Trash2 } from "lucide-react";
+import { User, Phone, ShoppingBag, Calendar } from "lucide-react";
 import { format } from "date-fns";
 
 export default function CustomersTable({
@@ -27,7 +27,6 @@ export default function CustomersTable({
   limit,
   onPageChange,
   setLimit,
-  onDelete, // Optional, if you want to support deletion
 }) {
   if (loading) {
     return (
@@ -134,13 +133,6 @@ export default function CustomersTable({
                     {customer.createdAt ? format(new Date(customer.createdAt), "dd MMM yyyy") : "N/A"}
                   </div>
                 </TableCell>
-                {/* <TableCell align="right">
-                  <Tooltip title="Delete (Restricted)">
-                    <IconButton size="small" disabled sx={{ opacity: 0.3 }}>
-                      <Trash2 size={16} />
-                    </IconButton>
-                  </Tooltip>
-                </TableCell> */}
               </TableRow>
             ))}
           </TableBody>

@@ -4,6 +4,8 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useDashboard } from '@/hooks/useDashboard';
 import StatCard from './StatCard';
+import { usePermissions } from '@/hooks/usePermissions';
+import { PERMISSIONS } from '@/lib/constants';
 import {
   IndianRupee,
   ShoppingBasket,
@@ -21,6 +23,7 @@ import { Button } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
 export default function DashboardSummary() {
+  const { checkPermission } = usePermissions();
   const { useEarningsSummary, useOrdersSummary, useCustomersSummary } = useDashboard();
 
   // Shared date range for summary (Default: Today)
@@ -47,7 +50,7 @@ export default function DashboardSummary() {
   const customers = customersQ.data?.data || {};
 
   // Formatted sub-stats for Earnings
-  const earningsExtra = (
+  const earningsExtra = checkPermission(PERMISSIONS.BILLING_VIEW) ? (
     <>
       <div className="flex items-center gap-1.5">
         <Wallet size={12} className="text-white/60" />
@@ -58,10 +61,10 @@ export default function DashboardSummary() {
         <span className="text-[13px] capitalize font-semibold">Online: ₹{earnings.onlineAmount || 0}</span>
       </div>
     </>
-  );
+  ) : null;
 
   // Formatted sub-stats for Orders
-  const ordersExtra = (
+  const ordersExtra = checkPermission(PERMISSIONS.ORDERS_VIEW) ? (
     <div className="flex flex-wrap gap-x-3 gap-y-1">
       {orders.byOrderType?.map((type) => (
         <div key={type._id} className="flex items-center gap-1">
@@ -70,12 +73,12 @@ export default function DashboardSummary() {
         </div>
       ))}
     </div>
-  );
+  ) : null;
 
   const stats = [
     {
       title: "Total Revenue",
-      value: `₹${earnings.totalAmount || 0}`,
+      value: checkPermission(PERMISSIONS.BILLING_VIEW) ? `₹${earnings.totalAmount || 0}` : "₹ ****",
       subtitle: `${formatDate_DD_MMM_YYYY(dateRange.from)} - ${formatDate_DD_MMM_YYYY(dateRange.to)}`,
       Icon: IndianRupee,
       bgGradient: "bg-linear-to-r from-[#0ea5e9] to-[#2563eb]",
@@ -84,7 +87,7 @@ export default function DashboardSummary() {
     },
     {
       title: "Total Orders",
-      value: orders.total || 0,
+      value: checkPermission(PERMISSIONS.ORDERS_VIEW) ? (orders.total || 0) : "****",
       subtitle: "Completed & Pending",
       Icon: ShoppingBasket,
       bgGradient: "bg-linear-to-r from-[#8b5cf6] to-[#7c3aed]",
@@ -93,7 +96,7 @@ export default function DashboardSummary() {
     },
     {
       title: "New Customers",
-      value: customers.newCustomers || 0,
+      value: checkPermission(PERMISSIONS.CUSTOMERS_VIEW) ? (customers.newCustomers || 0) : "****",
       subtitle: "Registered today",
       Icon: UserPlus,
       bgGradient: "bg-linear-to-r from-[#10b981] to-[#059669]",

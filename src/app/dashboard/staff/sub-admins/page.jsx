@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useMemo } from "react";
 import InnerDashboardLayout from "@/components/dashboard/InnerDashboardLayout";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { useStaffs } from "@/hooks/useStaffs";
 import SubAdminsTable from "./components/SubAdminsTable";
 import SubAdminDialog from "./components/SubAdminDialog";
@@ -12,12 +13,15 @@ import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { useAuthStore } from "@/stores/useAuthStore";
 import StatCard2 from "@/components/shared/StatCard2";
+import { usePermissions } from "@/hooks/usePermissions";
+import { PERMISSIONS, MODULES } from "@/lib/constants";
+import PermissionDenied from "@/components/shared/PermissionDenied";
 
 function SubAdminsPage() {
     const { subAdminsQuery } = useStaffs();
     const { user } = useAuthStore();
+    const { checkPermission, isModuleEnabled } = usePermissions();
 
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
@@ -81,6 +85,8 @@ function SubAdminsPage() {
         setPage(1);
         staffData.refetch && staffData.refetch();
     };
+    const hasAccess = isModuleEnabled(MODULES.STAFF_BASE) && checkPermission(PERMISSIONS.STAFF_VIEW);
+    if (!hasAccess) return <PermissionDenied />;
 
     return (
         <InnerDashboardLayout>
@@ -106,18 +112,20 @@ function SubAdminsPage() {
                         </span>
                     </Tooltip>
 
-                    <Tooltip title={`Add Sub Admin`} arrow>
-                        <span>
-                            <Button
-                                variant="outlined"
-                                sx={{ textTransform: "capitalize" }}
-                                onClick={() => setDialogOpen(true)}
-                                aria-label={`Add Sub Admin`}
-                            >
-                                <AddIcon />
-                            </Button>
-                        </span>
-                    </Tooltip>
+                    {checkPermission(PERMISSIONS.STAFF_CREATE) && (
+                        <Tooltip title={`Add Sub Admin`} arrow>
+                            <span>
+                                <Button
+                                    variant="outlined"
+                                    sx={{ textTransform: "capitalize" }}
+                                    onClick={() => setDialogOpen(true)}
+                                    aria-label={`Add Sub Admin`}
+                                >
+                                    <AddIcon />
+                                </Button>
+                            </span>
+                        </Tooltip>
+                    )}
                 </div>
             </div>
 
