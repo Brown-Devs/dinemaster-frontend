@@ -179,7 +179,7 @@ export function UpdatePaymentDialog({ open, onClose, order }) {
                   borderRadius: "4px !important",
                   border: "1px solid var(--border) !important",
                   color: "var(--muted)",
-                  '&.Mui-selected': { bgcolor: "primary.main", color: "black" }
+                  '&.Mui-selected': { bgcolor: "primary.main", color: "white" }
                 }}
               >
                 {m}
