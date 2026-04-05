@@ -23,6 +23,7 @@ import { useMasterProducts } from "@/hooks/superAdmin/useMasterProducts";
 import MasterProductFormModal from "./components/MasterProductFormModal";
 import { usePermissions } from "@/hooks/usePermissions";
 import { PERMISSIONS } from "@/lib/constants";
+import MasterProductsTable from "./components/MasterProductsTable";
 
 export default function MasterProductsPage() {
   const router = useRouter();
@@ -39,9 +40,9 @@ export default function MasterProductsPage() {
   const [editingProduct, setEditingProduct] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
 
-  const { 
-    masterProductsQuery, 
-    masterCategoriesQuery 
+  const {
+    masterProductsQuery,
+    masterCategoriesQuery
   } = useMasterProducts();
   const { data: catData } = masterCategoriesQuery();
   const categories = catData?.data || [];
