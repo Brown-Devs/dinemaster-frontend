@@ -120,10 +120,10 @@ export default function LoginPage() {
                 <div className="relative z-10 flex flex-col justify-center px-16 text-white tracking-tighter">
                     <div className="max-w-lg">
                         <h1 className="text-5xl font-bold mb-6 leading-tight">
-                            Transform Your <span className="text-blue-300">Sales Process</span>
+                            Transform Your <span className="text-red-300">Restaurant Operations</span>
                         </h1>
                         <p className="text-xl text-blue-100 mb-8 leading-relaxed">
-                            Experience the power of modern CRM technology to drive your business growth and customer relationships.
+                            Experience the power of a modern POS and management system to streamline your kitchen, serve customers faster, and grow your business.
                         </p>
 
                         {/* Features List */}
@@ -132,13 +132,13 @@ export default function LoginPage() {
                                 <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
                                     <span className="text-blue-300">✓</span>
                                 </div>
-                                <span className="text-blue-100 text-lg">Lead Management</span>
+                                <span className="text-blue-100 text-lg">Point of Sale & Billing</span>
                             </div>
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
                                     <span className="text-blue-300">✓</span>
                                 </div>
-                                <span className="text-blue-100 text-lg">Sales Automation</span>
+                                <span className="text-blue-100 text-lg">Kitchen Display & Automation</span>
                             </div>
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
@@ -151,15 +151,24 @@ export default function LoginPage() {
                 </div>
             </div>
             {/* Right Side - Login Form */}
-            <div className="flex-1 flex items-center justify-center px-6 py-12 lg:px-12">
-                <div className="bg-card rounded-2xl border border-border p-4 sm:p-7 max-w-md w-full">
+            <div 
+                className="flex-1 flex items-center justify-center px-6 py-12 lg:px-12 relative bg-cover bg-center bg-no-repeat lg:bg-none!"
+                style={{
+                    backgroundImage: `url('https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')`
+                }}
+            >
+                {/* Mobile Background Overlays (hidden on large screens) */}
+                <div className="absolute inset-0 bg-black/50 lg:hidden block"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 to-indigo-900/60 lg:hidden block"></div>
+
+                <div className="bg-card rounded-2xl border border-border p-4 sm:p-7 max-w-md w-full relative z-10 shadow-2xl">
                     {/* Logo */}
                     {/* Logo */}
                     <div className="flex justify-center mb-8">
                         <img
                             src="/logo2L.png"
                             alt="Logo"
-                            className="h-18 object-contain rounded-sm"
+                            className="h-12 object-contain rounded-sm"
                         />
 
                         {/* <img
@@ -167,13 +176,6 @@ export default function LoginPage() {
                             alt="Logo"
                             className="h-18 object-contain rounded-sm hidden dark:block"
                         /> */}
-                    </div>
-
-
-                    <div className="text-center text-black mb-0 bg-gradient-to-t from-blue-100 via-blue-50 to-blue-100 p-4 rounded-md">
-                        <h2 className='font-bold text-xl tracking-tight'>
-                            Dashboard Login
-                        </h2>
                     </div>
 
                     {user ? (

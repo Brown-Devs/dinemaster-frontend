@@ -14,6 +14,8 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useCartStore } from "@/stores/useCartStore";
 
+import { MonitorSmartphone } from "lucide-react";
+
 export default function BillingPage() {
   const [step, setStep] = useState(1); // 1 = Menu, 2 = Customer details / Checkout, 3 = Success
   const [orderResult, setOrderResult] = useState(null);
@@ -91,7 +93,21 @@ export default function BillingPage() {
 
   return (
     <InnerDashboardLayout>
-      <div className="h-[calc(100vh-70px)] flex gap-4 overflow-hidden pt-2">
+      {/* Mobile Restriction Message */}
+      <div className="flex md:hidden flex-col items-center justify-center h-[calc(100vh-120px)] px-6 text-center">
+        <div className="bg-card border border-border p-8 rounded-2xl shadow-sm flex flex-col items-center max-w-[300px]">
+          <div className="w-16 h-16 bg-blue-50 flex items-center justify-center rounded-xl mb-5">
+            <MonitorSmartphone size={32} className="text-blue-600" />
+          </div>
+          <h2 className="text-xl font-black tracking-tighter text-foreground mb-2">Desktop Required</h2>
+          <p className="text-xs text-muted font-medium">
+            The Billing Point of Sale interface is optimized for larger screens. Please open it on a tablet or desktop device.
+          </p>
+        </div>
+      </div>
+
+      {/* Main POS Interface - Hidden on Mobile */}
+      <div className="hidden md:flex h-[calc(100vh-70px)] gap-4 overflow-hidden pt-2">
 
         {step === 1 && (
           <>
