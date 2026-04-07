@@ -42,8 +42,11 @@ export default function BillingPage() {
     customerName,
     customerMobile,
     orderType,
+    table,
+    address,
     paymentStatus,
     payments,
+    notes,
     clearCart,
     getCartTotal
   } = useCartStore();
@@ -61,6 +64,9 @@ export default function BillingPage() {
       },
       orderType,
       paymentStatus,
+      table,
+      address,
+      notes,
       additionalDiscount: discountAmount,
       payments,
       items: cart.map(item => ({
@@ -83,6 +89,7 @@ export default function BillingPage() {
       const res = await createOrderMutation.mutateAsync(payload);
       if (res?.success) {
         setOrderResult(res.data.order);
+        clearCart(); // Ensure fresh state immediately after success
         setStep(3); // Success Screen
       }
     } catch (error) {
@@ -183,7 +190,7 @@ export default function BillingPage() {
         )}
 
         {step === 3 && orderResult && (
-          <div className="flex-1 h-full flex items-center justify-center">
+          <div className="flex-1 h-full overflow-y-auto no-scrollbar p-2 sm:p-4">
             <OrderSuccessView
               order={orderResult}
               onNewOrder={handleNewOrder}

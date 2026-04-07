@@ -63,6 +63,9 @@ export const PERMISSIONS = {
     // Kitchen
     KITCHEN_VIEW: "kitchen.view",
     KITCHEN_UPDATE: "kitchen.update",
+
+    // Settings
+    SETTINGS_VIEW: "settings.view",
 };
 
 export const MODULES = {

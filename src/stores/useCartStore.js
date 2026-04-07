@@ -10,6 +10,9 @@ export const useCartStore = create(
       customerName: "",
       customerMobile: "",
       orderType: "dinein", // dinein, packing, delivery
+      table: "",
+      address: "",
+      notes: "",
       paymentStatus: "not_paid", // not_paid, paid
       paymentMode: "cash", // cash, online, mix
       payments: {
@@ -27,6 +30,9 @@ export const useCartStore = create(
       setCustomerMobile: (mobile) => set({ customerMobile: mobile }),
       setOrderType: (type) => set({ orderType: type }),
       setPaymentStatus: (status) => set({ paymentStatus: status }),
+      setTable: (table) => set({ table }),
+      setAddress: (address) => set({ address }),
+      setNotes: (notes) => set({ notes }),
       
       setPaymentMode: (mode) => set((state) => {
         const total = get().getCartTotal();
@@ -132,6 +138,9 @@ export const useCartStore = create(
         discountAmount: 0, 
         customerName: "", 
         customerMobile: "", 
+        table: "",
+        address: "",
+        notes: "",
         payments: { cashAmount: 0, onlineAmount: 0 },
         paymentMode: "cash"
       }),

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -8,7 +8,8 @@ import {
   Paper,
   Divider,
   Stack,
-  Chip
+  Chip,
+  CircularProgress
 } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import ReceiptIcon from "@mui/icons-material/Receipt";
@@ -18,8 +19,108 @@ import PaymentsIcon from "@mui/icons-material/Payments";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
 import { format } from "date-fns";
+import { useAuthStore } from "@/stores/useAuthStore";
+import { pdf } from "@react-pdf/renderer";
+import { OrderReceiptPDF } from "@/components/shared/OrderReceiptPDF";
+import { toast } from "react-hot-toast";
 
 export default function OrderSuccessView({ order, onNewOrder }) {
+  const { user } = useAuthStore();
+  const [isPrinting, setIsPrinting] = useState(false);
+
+  // Helper for Receipt Branding
+  const getImageBase64 = (url) => {
+    if (!url) return Promise.resolve(null);
+    return new Promise((resolve) => {
+      try {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+
+        // Use proxy for absolute URLs to definitively bypass CORS restrictions
+        const isAbsolute = url.startsWith("http");
+        const objectUrl = isAbsolute
+          ? `/api/image-proxy?url=${encodeURIComponent(url)}`
+          : url;
+
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imageData.data;
+
+          for (let i = 0; i < data.length; i += 4) {
+            const brightness = 0.34 * data[i] + 0.5 * data[i + 1] + 0.16 * data[i + 2];
+            const value = brightness < 150 ? 0 : 255;
+            data[i] = value;
+            data[i + 1] = value;
+            data[i + 2] = value;
+            if (data[i + 3] > 0 && value === 0) data[i + 3] = 255;
+          }
+
+          ctx.putImageData(imageData, 0, 0);
+          resolve(canvas.toDataURL("image/png"));
+        };
+        img.onerror = () => resolve(null);
+        img.src = objectUrl;
+      } catch (e) {
+        resolve(null);
+      }
+    });
+  };
+
+  const handlePrintReceipt = async () => {
+    if (!order) return;
+    setIsPrinting(true);
+    const loadingToast = toast.loading("Generating receipt...");
+
+    try {
+      const comp = typeof order.company === 'object' ? order.company : { _id: order.company };
+      const [companyLogo, paymentQr, brandingLogo] = await Promise.all([
+        comp.logo ? getImageBase64(comp.logo) : Promise.resolve(null),
+        comp.paymentQr ? getImageBase64(comp.paymentQr) : Promise.resolve(null),
+        getImageBase64("/logo2L.png")
+      ]);
+
+      const blob = await pdf(
+        <OrderReceiptPDF
+          order={order}
+          companyLogo={companyLogo}
+          paymentQr={paymentQr}
+          brandingLogo={brandingLogo}
+        />
+      ).toBlob();
+
+      const url = URL.createObjectURL(blob);
+
+      // Direct Print Implementation: Using a hidden iframe to trigger the print dialog
+      const iframe = document.createElement("iframe");
+      iframe.style.display = "none";
+      iframe.src = url;
+      document.body.appendChild(iframe);
+
+      iframe.onload = () => {
+        setTimeout(() => {
+          iframe.contentWindow.print();
+          // Cleanup
+          setTimeout(() => {
+            document.body.removeChild(iframe);
+            URL.revokeObjectURL(url);
+          }, 1000);
+        }, 500);
+      };
+
+      toast.success("Print dialog opened", { id: loadingToast });
+    } catch (error) {
+      toast.error("Failed to generate receipt", { id: loadingToast });
+    } finally {
+      setIsPrinting(false);
+    }
+  };
+
   if (!order) return null;
 
   const {
@@ -55,13 +156,11 @@ export default function OrderSuccessView({ order, onNewOrder }) {
   };
 
   return (
-    <Box className="w-full max-w-5xl mx-auto flex flex-col items-center justify-center p-2 animate-in zoom-in duration-500 min-h-full">
+    <Box className="w-full max-w-5xl mx-auto flex flex-col items-center p-2 sm:p-4 animate-in zoom-in duration-500">
       <Paper
         elevation={0}
         sx={{
-          p: 0,
           borderRadius: 3,
-          overflow: "hidden",
           border: "1.5px solid var(--border)",
           bgcolor: "var(--card)",
           width: "100%",
@@ -114,13 +213,15 @@ export default function OrderSuccessView({ order, onNewOrder }) {
           </Box>
 
           <div className="flex gap-2">
-            {/* <Button
+            <Button
               variant="outlined"
-              startIcon={<ReceiptIcon />}
+              startIcon={isPrinting ? <CircularProgress size={16} color="inherit" /> : <ReceiptIcon />}
+              onClick={handlePrintReceipt}
+              disabled={isPrinting}
               sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 'bold' }}
             >
               Print Receipt
-            </Button> */}
+            </Button>
             <Button
               variant="contained"
               startIcon={<AddIcon />}
@@ -151,11 +252,11 @@ export default function OrderSuccessView({ order, onNewOrder }) {
               />
             </div>
 
-            <Stack 
-              spacing={1} 
-              sx={{ 
-                maxHeight: 380, 
-                overflowY: 'auto', 
+            <Stack
+              spacing={1}
+              sx={{
+                maxHeight: 380,
+                overflowY: 'auto',
                 pr: 0.5,
                 '&::-webkit-scrollbar': { width: '4px' },
                 '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(0,0,0,0.1)', borderRadius: '10px' }
@@ -240,22 +341,42 @@ export default function OrderSuccessView({ order, onNewOrder }) {
                     <Typography variant="subtitle1" fontWeight="bold" sx={{ color: "var(--fg)" }}>Grand Total</Typography>
                     <Typography variant="h5" fontWeight="900" color="primary">₹{totalAmount}</Typography>
                   </div>
-
-                  <div className="mt-1 flex flex-wrap gap-2">
-                    {payments?.cashAmount > 0 && (
-                      <div className="flex items-center gap-1.5 bg-green-50 px-2 py-1 rounded-lg border border-green-100">
-                        <Typography variant="caption" sx={{ fontWeight: 'bold', color: 'green' }}>CASH: ₹{payments.cashAmount}</Typography>
-                      </div>
-                    )}
-                    {payments?.onlineAmount > 0 && (
-                      <div className="flex items-center gap-1.5 bg-blue-50 px-2 py-1 rounded-lg border border-blue-100">
-                        <Typography variant="caption" sx={{ fontWeight: 'bold', color: 'blue' }}>ONLINE: ₹{payments.onlineAmount}</Typography>
-                      </div>
-                    )}
-                  </div>
                 </Stack>
               </Paper>
             </Box>
+
+            {/* Logistics & Notes (New Section as per Phase 1) */}
+            {(order.table || order.address || order.notes) && (
+              <Box>
+                <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1.5, color: "var(--muted)", textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 1, letterSpacing: 0.5 }}>
+                  Logistics & Notes
+                </Typography>
+                <Paper variant="outlined" sx={{ p: 2, borderRadius: 2.5, bgcolor: "var(--card)", border: '1px solid var(--border)' }}>
+                  <Stack spacing={1.5}>
+                    {order.table && (
+                      <div className="flex justify-between items-center">
+                        <Typography variant="body2" sx={{ color: "var(--muted)" }}>Table Number</Typography>
+                        <Typography variant="body2" fontWeight="bold" sx={{ color: "primary.main" }}>{order.table}</Typography>
+                      </div>
+                    )}
+                    {order.address && (
+                      <div className="flex flex-col gap-1">
+                        <Typography variant="body2" sx={{ color: "var(--muted)" }}>Delivery Address</Typography>
+                        <Typography variant="body2" fontWeight="bold" sx={{ color: "var(--fg)" }}>{order.address}</Typography>
+                      </div>
+                    )}
+                    {order.notes && (
+                      <div className="flex flex-col gap-1">
+                        <Typography variant="body2" sx={{ color: "var(--muted)" }}>Special Instructions</Typography>
+                        <Paper variant="filled" sx={{ p: 1, px: 1.5, bgcolor: 'rgba(var(--primary-rgb), 0.05)', border: '1px dashed var(--border)', borderRadius: 1.5 }}>
+                          <Typography variant="caption" sx={{ color: "var(--fg)", fontStyle: 'italic' }}>"{order.notes}"</Typography>
+                        </Paper>
+                      </div>
+                    )}
+                  </Stack>
+                </Paper>
+              </Box>
+            )}
 
             {/* 2. Customer Details */}
             <Box>

@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { 
-  Box, 
-  Typography, 
-  TextField, 
-  ToggleButtonGroup, 
-  ToggleButton, 
-  Paper, 
+import {
+  Box,
+  Typography,
+  TextField,
+  ToggleButtonGroup,
+  ToggleButton,
+  Paper,
   Grid,
   CircularProgress,
   InputAdornment
@@ -18,10 +18,13 @@ import { useCartStore } from "@/stores/useCartStore";
 import { useCustomers } from "@/hooks/admin/useCustomers";
 
 export default function CheckoutDetailsForm() {
-  const { 
+  const {
     customerName, setCustomerName,
     customerMobile, setCustomerMobile,
     orderType, setOrderType,
+    table, setTable,
+    address, setAddress,
+    notes, setNotes,
     paymentStatus, setPaymentStatus,
     paymentMode, setPaymentMode,
     payments, setPayments,
@@ -40,6 +43,12 @@ export default function CheckoutDetailsForm() {
       setCustomerName(customerData.data.customer.name);
     }
   }, [customerData, setCustomerName]);
+
+  // Conditional Clearing: Wipe table if not dinein, wipe address if not delivery
+  useEffect(() => {
+    if (orderType !== 'dinein') setTable("");
+    if (orderType !== 'delivery') setAddress("");
+  }, [orderType, setTable, setAddress]);
 
   // Mixed payment auto-calculation logic
   const handleCashChange = (val) => {
@@ -105,7 +114,7 @@ export default function CheckoutDetailsForm() {
         <Typography variant="h6" fontWeight="bold" sx={{ color: "var(--fg)", mb: 3 }}>
           Order Details
         </Typography>
-        
+
         <div className="space-y-6">
           {/* Order Type */}
           <div>
@@ -131,6 +140,35 @@ export default function CheckoutDetailsForm() {
               </ToggleButton>
             </ToggleButtonGroup>
           </div>
+
+          {/* Conditional Fields: Table or Address */}
+          {orderType === 'dinein' && (
+            <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+              <TextField
+                label="Table Number"
+                fullWidth
+                value={table || ""}
+                onChange={(e) => setTable(e.target.value)}
+                placeholder="e.g. T1, Table 5"
+                variant="outlined"
+              />
+            </div>
+          )}
+
+          {orderType === 'delivery' && (
+            <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+              <TextField
+                label="Delivery Address"
+                fullWidth
+                multiline
+                rows={2}
+                value={address || ""}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Enter complete address"
+                variant="outlined"
+              />
+            </div>
+          )}
 
           {/* Payment Status */}
           <div>
@@ -163,9 +201,9 @@ export default function CheckoutDetailsForm() {
             Payment Mode
           </Typography>
           <div className="bg-primary/10 px-3 py-1 rounded-full">
-             <Typography variant="body2" fontWeight="bold" color="primary">
-               Total: ₹{total}
-             </Typography>
+            <Typography variant="body2" fontWeight="bold" color="primary">
+              Total: ₹{total}
+            </Typography>
           </div>
         </div>
 
@@ -215,12 +253,32 @@ export default function CheckoutDetailsForm() {
         )}
 
         {paymentMode !== "mix" && (
-           <div className="p-3 bg-cardsBG rounded-xl border border-dashed border-border flex justify-center">
-              <Typography variant="body2" sx={{ color: "var(--muted)" }}>
-                 Processing full payment via <span className="text-primary font-bold">{paymentMode.toUpperCase()}</span>
-              </Typography>
-           </div>
+          <div className="p-3 bg-cardsBG rounded-xl border border-dashed border-border flex justify-center">
+            <Typography variant="body2" sx={{ color: "var(--muted)" }}>
+              Processing full payment via <span className="text-primary font-bold">{paymentMode.toUpperCase()}</span>
+            </Typography>
+          </div>
         )}
+
+        {/* Customer Notes */}
+        <Box sx={{ mt: 3 }}>
+          <TextField
+            fullWidth
+            multiline
+            rows={2}
+            label="Customer Notes"
+            placeholder="e.g. Extra spicy, No onions, etc."
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            variant="outlined"
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2,
+                bgcolor: 'rgba(var(--primary-rgb), 0.02)',
+              }
+            }}
+          />
+        </Box>
       </section>
     </div>
   );

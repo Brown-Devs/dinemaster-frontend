@@ -173,13 +173,13 @@ export default function Sidebar({
         module: MODULES.STAFF_BASE,
         permissions: PERMISSIONS.STAFF_VIEW,
       },
-      // {
-      //   label: "Settings",
-      //   icon: <Settings />,
-      //   path: "/dashboard/settings",
-      //   module: MODULES.SETTINGS,
-      //   permissions: PERMISSIONS.SETTINGS_VIEW,
-      // },
+      {
+        label: "Settings",
+        icon: <Settings />,
+        path: "/dashboard/settings",
+        module: MODULES.SETTINGS,
+        permissions: PERMISSIONS.SETTINGS_VIEW,
+      },
     ];
 
     return base;

@@ -1,14 +1,14 @@
 // hooks/useCompanies.js
 import api from "@/lib/services/axios";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { useLeadStatusStore } from "@/stores/useLeadStatusStore";
+// import { useLeadStatusStore } from "@/stores/useLeadStatusStore";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 export const useCompanies = () => {
     const queryClient = useQueryClient();
     const { user } = useAuthStore();
-    const setRoleLabels = useLeadStatusStore((s) => s.setRoleLabels);
+    // const setRoleLabels = useLeadStatusStore((s) => s.setRoleLabels);
 
     // Get all companies in pagination
     const companiesQuery = (params) => {
@@ -125,7 +125,7 @@ export const useCompanies = () => {
             queryFn: () =>
                 api.get("/company/role-labels").then(res => {
                     // console.log("Response: ", res.data?.data);
-                    setRoleLabels(res.data?.data);
+                    // setRoleLabels(res.data?.data);
                     return res.data;
                 }),
             keepPreviousData: true,
