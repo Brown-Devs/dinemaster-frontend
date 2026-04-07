@@ -95,25 +95,36 @@ export default function OrderSuccessView({ order, onNewOrder }) {
       ).toBlob();
 
       const url = URL.createObjectURL(blob);
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-      // Direct Print Implementation: Using a hidden iframe to trigger the print dialog
-      const iframe = document.createElement("iframe");
-      iframe.style.display = "none";
-      iframe.src = url;
-      document.body.appendChild(iframe);
+      if (isMobile) {
+        // Mobile browsers block iframe printing. Open in new tab for native mobile print/share.
+        window.open(url, '_blank');
+        toast.success("PDF opened for printing", { id: loadingToast });
+      } else {
+        // Desktop: Use hidden iframe for direct print dialog
+        const iframe = document.createElement("iframe");
+        iframe.style.visibility = "hidden";
+        iframe.style.position = "fixed";
+        iframe.style.right = "0";
+        iframe.style.bottom = "0";
+        iframe.src = url;
+        document.body.appendChild(iframe);
 
-      iframe.onload = () => {
-        setTimeout(() => {
-          iframe.contentWindow.print();
-          // Cleanup
+        iframe.onload = () => {
           setTimeout(() => {
-            document.body.removeChild(iframe);
-            URL.revokeObjectURL(url);
-          }, 1000);
-        }, 500);
-      };
-
-      toast.success("Print dialog opened", { id: loadingToast });
+            iframe.contentWindow.print();
+            toast.success("Print dialog opened", { id: loadingToast });
+            // Cleanup
+            setTimeout(() => {
+              if (document.body.contains(iframe)) {
+                document.body.removeChild(iframe);
+              }
+              URL.revokeObjectURL(url);
+            }, 2000);
+          }, 500);
+        };
+      }
     } catch (error) {
       toast.error("Failed to generate receipt", { id: loadingToast });
     } finally {
