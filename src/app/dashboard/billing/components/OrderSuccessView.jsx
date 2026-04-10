@@ -24,7 +24,7 @@ import { pdf } from "@react-pdf/renderer";
 import { OrderReceiptPDF } from "@/components/shared/OrderReceiptPDF";
 import { toast } from "react-hot-toast";
 
-export default function OrderSuccessView({ order, onNewOrder }) {
+export default function OrderSuccessView({ order, onNewOrder, isEdit }) {
   const { user } = useAuthStore();
   const [isPrinting, setIsPrinting] = useState(false);
 
@@ -201,7 +201,7 @@ export default function OrderSuccessView({ order, onNewOrder }) {
             <div>
               <div className="flex items-center gap-2 mb-0.5">
                 <Typography variant="h6" fontWeight="900" sx={{ color: "var(--fg)", lineHeight: 1 }}>
-                  Order Placed!
+                  {isEdit ? "Order Updated!" : "Order Placed!"}
                 </Typography>
                 <Chip
                   label={status?.toUpperCase() || "NEW"}

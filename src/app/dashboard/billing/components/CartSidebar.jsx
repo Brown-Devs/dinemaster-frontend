@@ -58,7 +58,7 @@ export default function CartSidebar({ onConfirm, confirmText = "Confirm Order", 
                   <Typography variant="subtitle2" fontWeight="bold" sx={{ color: "var(--fg)", lineHeight: 1.1, fontSize: 13 }}>
                     {item.product.name}
                   </Typography>
-                  {item.product.variants?.length > 1 && (
+                  {(item.variant?.name || item.variantName) && (
                     <Typography variant="caption" sx={{ color: "var(--muted)", fontSize: 10 }}>
                       {item.variant?.name || item.variantName}
                     </Typography>

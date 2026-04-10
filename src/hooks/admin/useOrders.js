@@ -37,6 +37,18 @@ export const useOrders = () => {
         });
     };
 
+    // 2. Fetch a single Order
+    const orderQuery = (id) => {
+        return useQuery({
+            queryKey: ["order", id],
+            queryFn: async () => {
+                const response = await api.get(`/orders/${id}`);
+                return response.data;
+            },
+            enabled: !!id,
+        });
+    };
+
     // 3. Update Order (Administrative/Payment)
     const updateOrderMutation = useMutation({
         mutationFn: async ({ id, data }) => {
@@ -92,6 +104,7 @@ export const useOrders = () => {
     return {
         createOrderMutation,
         ordersQuery,
+        orderQuery,
         kitchenOrdersQuery,
         updateOrderMutation,
         statsQuery

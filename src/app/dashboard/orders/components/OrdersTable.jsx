@@ -34,6 +34,8 @@ import { format } from "date-fns";
 import { TablePagination } from "@mui/material";
 import { usePermissions } from "@/hooks/usePermissions";
 import { PERMISSIONS } from "@/lib/constants";
+import { useRouter } from "next/navigation";
+
 
 const statusColors = {
   new: { bg: "#e3f2fd", text: "#1976d2", label: "New" },
@@ -68,6 +70,12 @@ export default function OrdersTable({
   onViewDetails
 }) {
   const { checkPermission } = usePermissions();
+  const router = useRouter();
+
+  const handleEditOrder = (order) => {
+    router.push(`/dashboard/billing?editOrder=${order._id}`);
+  };
+
 
   return (
     <Box sx={{ width: '100%', overflow: 'hidden' }}>
@@ -197,7 +205,15 @@ export default function OrdersTable({
                           <VisibilityIcon fontSize="small" sx={{ color: "var(--muted)" }} />
                         </IconButton>
                       </Tooltip>
+                      {checkPermission(PERMISSIONS.ORDERS_UPDATE) && order.status !== 'cancelled' && (
+                        <Tooltip title="Edit Order in Billing">
+                          <IconButton size="small" onClick={() => handleEditOrder(order)}>
+                            <EditIcon fontSize="small" sx={{ color: "var(--muted)" }} />
+                          </IconButton>
+                        </Tooltip>
+                      )}
                     </div>
+
                   </TableCell>
                 </TableRow>
               ))

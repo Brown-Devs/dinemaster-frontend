@@ -19,6 +19,10 @@ export const useCartStore = create(
         cashAmount: 0,
         onlineAmount: 0,
       },
+      isEditMode: false,
+      editOrderId: null,
+      editOrderNumber: null,
+
 
       // Helper to generate a unique ID based on product + variant + addons
       generateCartId: (productId, variantName, addOns = []) => {
@@ -142,8 +146,56 @@ export const useCartStore = create(
         address: "",
         notes: "",
         payments: { cashAmount: 0, onlineAmount: 0 },
-        paymentMode: "cash"
+        paymentMode: "cash",
+        isEditMode: false,
+        editOrderId: null,
+        editOrderNumber: null
       }),
+
+      initializeFromOrder: (order) => {
+        const state = get();
+        
+        const cartItems = order.items.map(item => {
+          const variant = {
+            name: item.variant.name,
+            actualPrice: item.variant.price,
+            discountedPrice: 0 // We use the captured price as base
+          };
+
+          const cartId = state.generateCartId(item.productId._id || item.productId, item.variant.name, item.addOns);
+          const addOnsTotal = item.addOns.reduce((sum, addon) => sum + Number(addon.price || 0), 0);
+
+          return {
+            cartId,
+            product: { 
+              ...item.productId, 
+              category: item.categoryId?._id || item.categoryId 
+            },
+            variant,
+            variantName: item.variant.name,
+            addOns: item.addOns,
+            quantity: item.quantity,
+            pricePerItem: item.variant.price + addOnsTotal
+          };
+        });
+
+        set({
+          cart: cartItems,
+          discountAmount: order.additionalDiscount || 0,
+          customerName: order.customer?.name || "Guest",
+          customerMobile: order.customer?.mobileNo || "",
+          orderType: order.orderType,
+          table: order.table || "",
+          address: order.address || "",
+          notes: order.notes || "",
+          payments: order.payments,
+          paymentStatus: order.paymentStatus,
+          isEditMode: true,
+          editOrderId: order._id,
+          editOrderNumber: order.orderId
+        });
+      },
+
 
       // Selectors (derived data computation)
       getCartTotal: () => {

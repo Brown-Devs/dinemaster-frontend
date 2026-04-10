@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+
 import InnerDashboardLayout from "@/components/dashboard/InnerDashboardLayout";
 import BillingMenu from "./components/BillingMenu";
 import CartSidebar from "./components/CartSidebar";
@@ -18,24 +20,31 @@ import { PERMISSIONS, MODULES } from "@/lib/constants";
 import PermissionDenied from "@/components/shared/PermissionDenied";
 
 import { MonitorSmartphone } from "lucide-react";
+import api from "@/lib/services/axios";
 
 export default function BillingPage() {
+  const router = useRouter();
   const { isModuleEnabled, checkPermission } = usePermissions();
 
   const [step, setStep] = useState(1); // 1 = Menu, 2 = Customer details / Checkout, 3 = Success
   const [orderResult, setOrderResult] = useState(null);
 
+  const searchParams = useSearchParams();
+  const editOrderParam = searchParams.get("editOrder");
+
   // Fetch all necessities for the POS
   const { allBrandProductsQuery } = useBrandProducts();
   const { allCategoriesQuery } = useCategories();
-  const { createOrderMutation } = useOrders();
+  const { createOrderMutation, updateOrderMutation, orderQuery } = useOrders();
+
+  const { data: orderToEdit } = orderQuery(editOrderParam);
+
 
   const productsData = allBrandProductsQuery();
   const categoriesData = allCategoriesQuery();
 
   const products = productsData.data?.data?.data?.products || productsData.data?.data?.data || [];
   const categories = categoriesData.data?.data?.data?.categories || categoriesData.data?.data?.data || [];
-
   const {
     cart,
     discountAmount,
@@ -48,8 +57,25 @@ export default function BillingPage() {
     payments,
     notes,
     clearCart,
-    getCartTotal
+    getCartTotal,
+    isEditMode,
+    editOrderId,
+    editOrderNumber,
+    initializeFromOrder
   } = useCartStore();
+
+  useEffect(() => {
+    if (editOrderParam) {
+      if (orderToEdit?.success && editOrderParam !== editOrderId) {
+        initializeFromOrder(orderToEdit.data);
+      }
+    } else {
+      if (isEditMode) {
+        clearCart();
+      }
+    }
+  }, [orderToEdit, editOrderParam, editOrderId, isEditMode, initializeFromOrder, clearCart]);
+
 
   const handleConfirmOrderClick = () => {
     setStep(2);
@@ -86,22 +112,49 @@ export default function BillingPage() {
     };
 
     try {
-      const res = await createOrderMutation.mutateAsync(payload);
+      let res;
+      if (isEditMode) {
+        res = await updateOrderMutation.mutateAsync({ id: editOrderId, data: payload });
+      } else {
+        res = await createOrderMutation.mutateAsync(payload);
+      }
+
       if (res?.success) {
-        setOrderResult(res.data.order);
+        // As requested: Force a fresh fetch from the server to ensure absolute data parity for the success view
+        let finalOrder = res.data.order;
+        
+        if (isEditMode) {
+          try {
+            const freshRes = await api.get(`/orders/${editOrderId}`);
+            if (freshRes?.data?.data) {
+              finalOrder = freshRes.data.data;
+            }
+          } catch (fetchError) {
+            console.error("Fresh fetch after update failed, using mutation result:", fetchError);
+          }
+        }
+
+        setOrderResult(finalOrder);
         clearCart(); // Ensure fresh state immediately after success
         setStep(3); // Success Screen
       }
     } catch (error) {
       console.error("Order submission failed:", error);
     }
+
   };
 
   const handleNewOrder = () => {
     clearCart();
     setOrderResult(null);
     setStep(1);
+    router.push("/dashboard/billing");
   };
+
+  const handleCancelEdit = () => {
+    router.push("/dashboard/billing");
+  };
+
 
   return (
     <InnerDashboardLayout>
@@ -124,7 +177,24 @@ export default function BillingPage() {
         {step === 1 && (
           <>
             {/* Left 75%: Point of Sale Menu */}
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 flex flex-col gap-2">
+              {isEditMode && (
+                <div className="px-1 py-1 flex items-center justify-between">
+                  <Typography variant="h5" sx={{ fontWeight: '1000', letterSpacing: -1 }}>
+                    Edit Order - <span className="text-primary">#{editOrderNumber}</span>
+                  </Typography>
+                  <Button 
+                    size="small" 
+                    variant="outlined" 
+                    color="error" 
+                    onClick={handleCancelEdit}
+                    sx={{ textTransform: 'none', fontWeight: 'bold' }}
+                  >
+                    Cancel Edit
+                  </Button>
+                </div>
+
+              )}
               <BillingMenu
                 products={products}
                 categories={categories}
@@ -132,6 +202,7 @@ export default function BillingPage() {
                 loadingCategories={categoriesData.isLoading}
               />
             </div>
+
 
             {/* Right 25%: Permanent Cart Sidebar */}
             <div className="w-[320px] xl:w-[380px] shrink-0 h-full border border-border rounded-2xl overflow-hidden shadow-sm bg-card">
@@ -176,14 +247,17 @@ export default function BillingPage() {
                   <Button
                     variant="contained"
                     size="large"
-                    disabled={createOrderMutation.isPending}
-                    startIcon={createOrderMutation.isPending ? <CircularProgress size={20} color="inherit" /> : <CheckCircleIcon />}
+                    disabled={createOrderMutation.isPending || updateOrderMutation.isPending}
+                    startIcon={(createOrderMutation.isPending || updateOrderMutation.isPending) ? <CircularProgress size={20} color="inherit" /> : <CheckCircleIcon />}
                     onClick={handlePlaceOrder}
                     sx={{ px: 8, py: 1.5, borderRadius: 3, fontWeight: '900', fontSize: 18, textTransform: 'none', boxShadow: 4 }}
                   >
-                    {createOrderMutation.isPending ? "Creating Order..." : "Complete Order"}
+                    {(createOrderMutation.isPending || updateOrderMutation.isPending) 
+                      ? (isEditMode ? "Updating Order..." : "Creating Order...") 
+                      : (isEditMode ? "Update Order" : "Complete Order")}
                   </Button>
                 )}
+
               </div>
             </div>
           </div>
@@ -194,6 +268,7 @@ export default function BillingPage() {
             <OrderSuccessView
               order={orderResult}
               onNewOrder={handleNewOrder}
+              isEdit={isEditMode}
             />
           </div>
         )}
