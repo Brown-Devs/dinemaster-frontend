@@ -2,14 +2,19 @@
 import React from 'react';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { Skeleton, Box } from '@mui/material';
+import { Skeleton, Box, Button, IconButton } from '@mui/material';
 import { RefreshCw, CalendarDays } from 'lucide-react';
 import { format } from 'date-fns';
 import { useState } from 'react';
 
-export default function ChartWrapper({ title, icon: Icon, children, dateRange, onDateChange, loading, onReset }) {
+export default function ChartWrapper({ title, icon: Icon, children, dateRange, onDateChange, loading, onReset, isRefetching, onRefetch }) {
   const [openFrom, setOpenFrom] = useState(false);
   const [openTo, setOpenTo] = useState(false);
+
+  const handleRefresh = () => {
+    onReset?.();
+    onRefetch?.();
+  };
 
   return (
     <div className="bg-card rounded-2xl border border-border p-6 flex flex-col h-[450px] transition-all duration-300 hover:translate-y-[-2px]">
@@ -72,18 +77,20 @@ export default function ChartWrapper({ title, icon: Icon, children, dateRange, o
               </LocalizationProvider>
             </div>
           </div>
-          <button
-            onClick={onReset}
+          <IconButton
+            onClick={handleRefresh}
             className="p-2.5 hover:bg-card2 rounded-xl text-muted hover:text-foreground border border-border transition-all"
-            title="Reset dates"
+            title="Reset & Refresh"
+            disabled={loading || isRefetching}
+            loading={loading || isRefetching}
           >
             <RefreshCw size={18} />
-          </button>
+          </IconButton>
         </div>
       </div>
 
       <div className="flex-1 w-full min-h-0 bg-transparent rounded-xl relative">
-        {loading ? (
+        {(loading || isRefetching) ? (
           <Box sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Skeleton variant="rectangular" width="100%" height="100%" sx={{ borderRadius: 2, bgcolor: 'var(--card2)' }} />
           </Box>

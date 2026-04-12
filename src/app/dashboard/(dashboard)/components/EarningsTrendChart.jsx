@@ -12,7 +12,7 @@ export default function EarningsTrendChart() {
   const [dateRange, setDateRange] = useState(initialRange);
 
   const formatParam = (date) => date ? format(date, 'yyyy-MM-dd') : undefined;
-  const { data, isLoading } = useEarningsChart({ 
+  const { data, isLoading, isRefetching, refetch } = useEarningsChart({ 
     from: formatParam(dateRange.from), 
     to: formatParam(dateRange.to) 
   });
@@ -24,7 +24,9 @@ export default function EarningsTrendChart() {
       dateRange={dateRange}
       onDateChange={(key, val) => setDateRange(prev => ({ ...prev, [key]: val }))}
       onReset={() => setDateRange(initialRange)}
+      onRefetch={refetch}
       loading={isLoading}
+      isRefetching={isRefetching}
     >
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data?.data || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -41,11 +43,25 @@ export default function EarningsTrendChart() {
             tickLine={false} 
             tick={{ fontSize: 10, fill: 'var(--muted)' }} 
             minTickGap={30}
+            tickFormatter={(str) => {
+              try {
+                return format(new Date(str), 'MMM dd');
+              } catch (e) {
+                return str;
+              }
+            }}
           />
           <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'var(--muted)' }} />
           <Tooltip 
             contentStyle={{ backgroundColor: 'var(--card)', borderRadius: '12px', border: '1px solid var(--border)', color: 'var(--fg)' }}
             itemStyle={{ fontSize: '12px' }}
+            labelFormatter={(label) => {
+              try {
+                return format(new Date(label), 'PPP');
+              } catch (e) {
+                return label;
+              }
+            }}
           />
           <Area type="monotone" dataKey="total" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorTotal)" />
           <Area type="monotone" dataKey="online" stroke="#3b82f6" strokeWidth={2} fill="transparent" strokeDasharray="5 5" />
