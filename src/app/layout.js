@@ -8,19 +8,14 @@ import CallNotifProvider from "@/components/shared/CallNotifProvider";
 const inter = Inter({ variable: "--font-sans", subsets: ["latin"], weight: ["400", "500", "600", "700"] });
 
 export const metadata = {
-  title: "Dine Master by Brown Devs",
-  description: "Restaurant management platform by Brown Devs...",
+  title: "Dine Master",
+  description: "Restaurant management platform",
   manifest: "/manifest.json",
 };
 
 export const viewport = {
   themeColor: "#ffffff"
 };
-
-
-// /
-
-
 
 export default function RootLayout({ children }) {
   return (
